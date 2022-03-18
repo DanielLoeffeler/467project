@@ -14,5 +14,7 @@ def edittask(tree):
 
 
 def removetask(tree):
-	# Button removes task selected in tree
-	pass
+	# Button removes tasks selected in tree
+	selected = tree.selection()
+	for item in selected:
+		tree.delete(item)

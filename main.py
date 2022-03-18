@@ -85,8 +85,8 @@ EditTask_B.grid(column=1, row=6, sticky='ew')
 RemoveTask_B.grid(column=2, row=6, sticky='ew')
 
 # Frequency Checkbox
-SetFreq = tk.Checkbutton(mainframe, text='Set Frequency')
-SetFreq.grid(column=2, row=7)
+FixFreq = tk.Checkbutton(mainframe, text='Fix Frequency')
+FixFreq.grid(column=2, row=7)
 
 # Run Button
 RunTask_B = tk.Button(mainframe, text='RUN')
