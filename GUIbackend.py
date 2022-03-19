@@ -18,3 +18,8 @@ def removetask(tree):
 	selected = tree.selection()
 	for item in selected:
 		tree.delete(item)
+
+
+def createplot(stuff):
+	# Creates the shit
+	pass
