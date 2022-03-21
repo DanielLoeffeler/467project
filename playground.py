@@ -27,12 +27,13 @@ def change_range(arr, start, stop, val):
 
 
 def make_yval(ranges, res, xrange):
-	# Takes the instance array and returns the array containing the values for each instance of time
+	# Takes the instance array and returns an array containing the frequency values for each unit of time
+	# between the start and the stop
 	taskval = np.zeros(xrange.size)
 
 	for i, item in enumerate(ranges):
-		taskval = change_range(taskval, item[0]/res, item[1]/res, item[2])
-
+		#taskval = change_range(taskval, item[0]/res, item[1]/res, item[2])
+		taskval[round(item[0]/res):round(item[1]/res)] = item[2]
 	return taskval
 
 
@@ -54,7 +55,7 @@ resolution = 0.01
 xrng = np.arange(0, 20, resolution)
 
 task1 = np.array([[0, 2.3, 1], [4.5, 6, 0.25], [13, 16, 0.5]])
-task2 = np.array([[2.3, 4, 0.5], [7, 10, 0.75], [11,12,1], [16,19,0.25]])
+task2 = np.array([[2.3, 4, 0.5], [7, 10, 0.75], [11, 12, 1], [16, 19, 0.25]])
 
 yval1 = make_yval(task1, resolution, xrng)
 yval2 = make_yval(task2, resolution, xrng)
