@@ -1,6 +1,6 @@
-"""""""""
+"""
 Main frontend GUI
-"""""""""
+"""
 
 import tkinter as tk
 from tkinter import ttk

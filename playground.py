@@ -1,13 +1,13 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-# [[label1, worstcom1, period1, invocations1],
+# [[label1, worstcom1, period1, invocations1];
 #  [label2, worstcom2, period2, invocations2]]
 # [[frequencies]]
 
-# [[label1, instances1]
-#  [label2, instances2]]
-# where instances:
+# [[label1, calculated1];
+#  [label2, calculated2]]
+# where calculated:
 # [[start,stop,frequency], [start,stop,frequency], [start,stop,frequency]]
 
 """
@@ -31,7 +31,7 @@ def make_yval(ranges, res, xrange):
 	taskval = np.zeros(xrange.size)
 
 	for i, item in enumerate(ranges):
-		taskval = change_range(taskval, item[0]/res, item[1]/res, item[2])
+		taskval = change_range(taskval, item[0] / res, item[1] / res, item[2])
 
 	return taskval
 
@@ -51,10 +51,11 @@ def make_yval(ranges, res, xrange):
 # yval2 = [0, 0, 0, .5, .5, .5, .5, 0, 0, 0, 0, 0, .25, .25, .25, .25, 0, 0, 0, 0]
 
 resolution = 0.01
-xrng = np.arange(0, 20, resolution)
+lastpoint = 20
+xrng = np.arange(0, lastpoint, resolution)
 
 task1 = np.array([[0, 2.3, 1], [4.5, 6, 0.25], [13, 16, 0.5]])
-task2 = np.array([[2.3, 4, 0.5], [7, 10, 0.75], [11,12,1], [16,19,0.25]])
+task2 = np.array([[2.3, 4, 0.5], [7, 10, 0.75], [11, 12, 1], [16, 19, 0.25]])
 
 yval1 = make_yval(task1, resolution, xrng)
 yval2 = make_yval(task2, resolution, xrng)
