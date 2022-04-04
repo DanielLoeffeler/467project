@@ -5,7 +5,7 @@ This code runs the math behind the system
 """
 import numpy as np
 
-a = np.array([[0,3,8,2,1],[1,3,10,1,1],[2,1,14,1,1]])
+a = np.array([[0,3,8,2,1],[1,5,50,5,1],[2,2,14,2,1]])
 
 def sortitmotherfucker(a):
     i=0
@@ -111,7 +111,7 @@ def Run(a):
     print(a)
     print(Release)
 
-    output=np.zeros((x*y*2+3,4))
+    output=np.zeros((x*y*10,4))
     index=0
     R=0
     finish=0
@@ -176,8 +176,13 @@ def Run(a):
             #Prepare to run next iteration
             c= int(Release[0,1])+3
 
-            #Calculate the time the task will finish
-            TF=a[b,c]/Freq + output[index-1,1]
+            #Calculate the time the task will finish assuming it is running clean
+            if Release[0,4]==0:
+                TF=a[b,c]/Freq + output[index-1,1]
+            #Calculate time to finish the task that has already been started
+            else:
+
+                TF=Release[0,4]/Freq + output[index-1,1]
 
             #Save the time temporarily
             temp=TF
@@ -198,14 +203,16 @@ def Run(a):
 
                 #Set the flag to show task has run to completion
                 Release[0, 3] = -1
-                # Update task deadline
-                Release[0, 2] = a[b, 2] * (Release[0, 1] + 1)
                 # Check if that was the last iteration to run
                 if Release[0,1]>=y:
                     Release[0,2]=np.max(Release)*(y+1)+1
-            # For when they did not match up
+            # For when they did not match up and the previous task did not finish running
             else:
-
+                temp=int(Release[0,1]+3)
+                Release[0,4] = (output[index-1,1] - output[index-1,0])
+                ReleaseNext(Release,x)
+            print(Release)
+            print(output)
     return output
 
 """
