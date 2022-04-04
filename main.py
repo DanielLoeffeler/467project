@@ -5,6 +5,7 @@ Main frontend GUI
 import tkinter as tk
 from tkinter import ttk
 import GUIbackend as GUI
+import numpy as np
 
 # Create the tkinter window object called root
 root = tk.Tk()
@@ -16,81 +17,63 @@ root.title("suck my cock")
 mainframe = ttk.Frame(root, padding="3 3 12 12")
 mainframe.grid(column=0, row=0, sticky='nsew')
 
+treeframe = ttk.Frame(mainframe)
+treeframe.grid(columnspan=3)
+
 root.columnconfigure(0, weight=1)
 root.rowconfigure(0, weight=1)
 
 
 # Table widget displaying entered task information
-columns = ('Task', 'Worst time', 'Period', 'Invo1', 'Invo2')
-tree = ttk.Treeview(mainframe, columns=columns, show="headings")
+columns = ['Task', 'Worst time', 'Period']
+ntree = GUI.Newtreeview(mainframe, columns=columns, show="headings")
 
-tree.grid(column=0, row=0, sticky='new', columnspan=3)
+ntree.tree.grid(column=0, row=0, sticky='new', columnspan=3)
 
-tree.column(0, stretch=True, width=100)
-tree.column(1, stretch=True, width=150)
-tree.column(2, stretch=True, width=75)
-tree.column(3, stretch=True, width=100)
-tree.column(4, stretch=True, width=100)
+for index, item in enumerate(columns):
+    ntree.tree.column(item, stretch=True, width=100, minwidth=100)
+    ntree.tree.heading(item, text=item)
 
-tree.heading('Task', text='Task')
-tree.heading('Worst time', text='Worst Computation')
-tree.heading('Period', text='Period')
-tree.heading('Invo1', text='Invocation 1')
-tree.heading('Invo2', text='Invocation 2')
+# Invocation amount entry field
+Tinvoc = tk.IntVar()
+Tinvoc_E = ttk.Entry(mainframe, textvariable=Tinvoc)
+Tinvoc_E.grid(column=0, row=1, sticky='ew')
 
-
-# Task information entry fields and labels
-Tlable = tk.StringVar()
-Tworst = tk.IntVar()
-Tperiod = tk.IntVar()
-Tinvoc1 = tk.IntVar()
-Tinvoc2 = tk.IntVar()
-
-Tlable_L = tk.Label(mainframe, text='Task Label')
-Tworst_L = tk.Label(mainframe, text='Worst Case')
-Tperiod_L = tk.Label(mainframe, text='Period')
-Tinvoc1_L = tk.Label(mainframe, text='Invocation 1')
-Tinvoc2_L = tk.Label(mainframe, text='Invocation 2')
-
-Tlable_E = ttk.Entry(mainframe, textvariable=Tlable)
-Tworst_E = ttk.Entry(mainframe, textvariable=Tworst)
-Tperiod_E = ttk.Entry(mainframe, textvariable=Tperiod)
-Tinvoc1_E = ttk.Entry(mainframe, textvariable=Tinvoc1)
-Tinvoc2_E = ttk.Entry(mainframe, textvariable=Tinvoc2)
-
-Tlable_L.grid(column=0, row=1, sticky='we')
-Tworst_L.grid(column=0, row=2, sticky='we')
-Tperiod_L.grid(column=0, row=3, sticky='we')
-Tinvoc1_L.grid(column=0, row=4, sticky='we')
-Tinvoc2_L.grid(column=0, row=5, sticky='we')
-
-Tlable_E.grid(column=1, row=1, sticky='we')
-Tworst_E.grid(column=1, row=2, sticky='we')
-Tperiod_E.grid(column=1, row=3, sticky='we')
-Tinvoc1_E.grid(column=1, row=4, sticky='we')
-Tinvoc2_E.grid(column=1, row=5, sticky='we')
-
-
-# Task Buttons
-AddTask_B = tk.Button(
+# Buttons
+Addinvoccol_B = tk.Button(
     mainframe,
-    text='Add Task',
-    command=lambda: GUI.addtolist(tree, Tlable.get(), Tworst.get(), Tperiod.get(), Tinvoc1.get(), Tinvoc2.get())
+    text='Set Invocations',
+    command=lambda: ntree.setinvoccol(Tinvoc.get())
 )
-EditTask_B = tk.Button(mainframe, text='Edit Task', command=lambda: GUI.edittask(tree))
-RemoveTask_B = tk.Button(mainframe, text='Remove Task', command=lambda: GUI.removetask(tree))
 
-AddTask_B.grid(column=0, row=6, sticky='ew')
-EditTask_B.grid(column=1, row=6, sticky='ew')
-RemoveTask_B.grid(column=2, row=6, sticky='ew')
+Run_B = tk.Button(
+    mainframe,
+    text='Run simulation'
+)
 
+Addinvoccol_B.grid(column=1, row=1, sticky='ew')
+Run_B.grid(column=0, row=2, sticky='ew')
+
+printvalues_B = tk.Button(
+    mainframe,
+    text='print',
+    command=lambda: ntree.getvalues()
+)
+printvalues_B.grid(column=0, row=3)
 # Frequency Checkbox
 FixFreq = tk.Checkbutton(mainframe, text='Fix Frequency')
-FixFreq.grid(column=2, row=7)
+FixFreq.grid(column=1, row=2)
 
-# Run Button
-RunTask_B = tk.Button(mainframe, text='RUN')
-RunTask_B.grid(column=1, row=7, sticky='ew')
+ntree.tree.bind('<Double-1>', ntree.set_cell_value)
+
+filler = ['', '', '', '', '', '', '', '', '', '', '', '']
+
+for i in range(min(len(filler), len(filler))):
+    ntree.tree.insert('', i, values=(filler[i]))
+#
+# filmore = ['red', '', '', '', '', '', '', '', '', '', '', '']
+# for i in range(min(len(filler), len(filler))):
+#     ntree.tree.insert('', i, values=(filler[i]))
 
 if __name__ == '__main__':
     root.mainloop()
