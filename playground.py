@@ -1,73 +1,157 @@
-# import numpy as np
-# import matplotlib.pyplot as plt
+import numpy as np
+import matplotlib.pyplot as plt
+import Math as EDF
+
+# [[label1, worstcom1, period1, invocations1,1, invocations1,2],
+#  [label2, worstcom2, period2, invocations2,1, invocations2,2]]
+# [[frequencies]]
+
+# [[label1, instances1]
+#  [label2, instances2]]
+# where instances:
+# [[start,stop,frequency], [start,stop,frequency], [start,stop,frequency]]
+
+"""
+make an x linspace from 0 to the end of the last task with a certain resolution
+make arrays with of the length of that x array filled with 0, then
+for the ranges where a task is (between start and stop) , fill that range with the frequency value
+"""
+
+
+
+
+
+# taskval = np.zeros(xrng.size)
 #
-# # [[label1, worstcom1, period1, invocations1,1, invocations1,2],
-# #  [label2, worstcom2, period2, invocations2,1, invocations2,2]]
-# # [[frequencies]]
-#
-# # [[label1, instances1]
-# #  [label2, instances2]]
-# # where instances:
-# # [[start,stop,frequency], [start,stop,frequency], [start,stop,frequency]]
-#
-# """
-# make an x linspace from 0 to the end of the last task with a certain resolution
-# make arrays with of the length of that x array filled with 0, then
-# for the ranges where a task is (between start and stop) , fill that range with the frequency value
-# """
-#
-#
-# def change_range(arr, start, stop, val):
-# 	# Change values in the numpy array in arr in the range of start and stop with val
-# 	rang = np.arange(round(start), round(stop), 1, dtype=int)
-#
-# 	for x in rang:
-# 		arr[x] = val
-# 	return arr
-#
-#
-# def make_yval(ranges, res, xrange):
-# 	# Takes the instance array and returns an array containing the frequency values for each unit of time
-# 	# between the start and the stop
-# 	taskval = np.zeros(xrange.size)
-#
-# 	for i, item in enumerate(ranges):
-# 		#taskval = change_range(taskval, item[0]/res, item[1]/res, item[2])
-# 		taskval[round(item[0]/res):round(item[1]/res)] = item[2]
-# 	return taskval
-#
-#
-# # taskval = np.zeros(xrng.size)
-# #
-# # for i, item in enumerate(task1):
-# # 	taskval = change_range(taskval, item[0]/resolution, item[1]/resolution, item[2])
-# # 	print(taskval)
-#
-# # item = np.array([0, 2.3, 1])
-# # test = np.arange(0, 30, 1)
-# # test = change_range(test, item[0]/resolution, item[1]/resolution, 4)
-#
-#
-# # yval1 = [0, 1, 1, 0, 0, 0, 0, .5, .5, .5, .5, 0, 0, 0, 0, 0, 1, 1, 1, 1]
-# # yval2 = [0, 0, 0, .5, .5, .5, .5, 0, 0, 0, 0, 0, .25, .25, .25, .25, 0, 0, 0, 0]
-#
-# resolution = 0.01
-# xrng = np.arange(0, 20, resolution)
-#
+# for i, item in enumerate(task1):
+# 	taskval = change_range(taskval, item[0]/resolution, item[1]/resolution, item[2])
+# 	print(taskval)
+
+# item = np.array([0, 2.3, 1])
+# test = np.arange(0, 30, 1)
+# test = change_range(test, item[0]/resolution, item[1]/resolution, 4)
+
+
+# yval1 = [0, 1, 1, 0, 0, 0, 0, .5, .5, .5, .5, 0, 0, 0, 0, 0, 1, 1, 1, 1]
+# yval2 = [0, 0, 0, .5, .5, .5, .5, 0, 0, 0, 0, 0, .25, .25, .25, .25, 0, 0, 0, 0]
+
+
+
+def dopl(given, calculated, resolution, endpoint):
+    def make_yval(ranges, res, xrange):
+        # Takes the instance array and returns an array containing the frequency values for each unit of time
+        # between the start and the stop
+        taskval = np.zeros(xrange.size)
+
+        for i, item in enumerate(ranges):
+            taskval[int(item[0] // res):int(item[1] // res)] = item[2]
+            print(int(item[0] // res))
+        return taskval
+
+    # Makes all the poitn on x axis for data
+    xrng = np.arange(0, endpoint, resolution)
+
+    # Take calculated result and break it into one 3D array where each array one step in is all one task
+    hold=np.zeros((given.shape[0],given.shape[1]-3,3))
+
+    for taskamt in range(given.shape[0]):
+        # for invocamt in range(given.shape[1]-3):
+        for index, x in enumerate(calculated[calculated[:, -1] == taskamt]):
+            hold[taskamt, index]=x[0:3]
+
+    colourlist=['b','g','r','c','m','y','k','w']
+    yvals=[]
+
+    ax1 = plt.subplot()
+    print (calculated)
+    # extract all the xticks from calculated array
+    xticks=[]
+    for item in calculated:
+        for x in range(2):
+            # print(item[x])
+            xticks.append(item[x])
+    # xticks=[round(num, 1) for num in xticks]
+    ax1.set_xticks(xticks, rotation=45)
+
+    # extracts all the yticks from calculated array
+    yticks=[]
+    for item in calculated:
+        yticks.append(item[2])
+    yticks = [round(num, 2) for num in yticks]
+    ax1.set_yticks(yticks)
+
+    # Add each task array to the plot with a unique colour
+    for index, tasklist in enumerate(hold):
+        yvals=make_yval(tasklist, resolution, xrng)
+        plt.bar(xrng, yvals, width=resolution, align="center", color=colourlist[index])
+
+    for index, value in enumerate(yticks):
+        plt.text(index, value,str(value))
+    plt.xticks(rotation=90)
+    plt.show()
+
+def runprog(givene):
+    calculatede = EDF.Run(givene)
+
+    # Remove all rows with only zeroes in them
+    calculatede = calculatede[~np.all(calculatede == 0, axis=1)]
+
+    # Remove all rows where the last item is -1
+    calculatede = calculatede[calculatede[:, -1] != -1]
+
+    resolutione = 0.005
+    endpointe = 20
+
+    dopl(givene, calculatede, resolutione, endpointe)
+
+given = np.array([[0, 3, 8, 2, 1],
+                  [1, 3, 10, 1, 1],
+                  [2, 1, 14, 1, 1]])
+# givene=np.array([[0,3,8,2,1],[1,5,50,5,1],[2,2,14,2,1]])
+
+
+runprog(given)
+
+# print(hold)
+# tasks = np.array([[0, 2.3, 1, 0],
+#                   [2.3, 4, 0.5, 1],
+#                   [4.5, 6, 0.25, 0],
+#                   [7, 10, 0.75, 1],
+#                   [11, 12, 1, 1],
+#                   [13, 16, 0.5, 0],
+#                   [16, 19, 0.25, 1]])
+
+
+# calculated = calculated[calculated[:,-1] !=-1]
+
+# print(n)
+# yval1=make_yval(calculated, resolution, xrng)
+# print(yval1)
 # task1 = np.array([[0, 2.3, 1], [4.5, 6, 0.25], [13, 16, 0.5]])
 # task2 = np.array([[2.3, 4, 0.5], [7, 10, 0.75], [11, 12, 1], [16, 19, 0.25]])
-#
+
 # yval1 = make_yval(task1, resolution, xrng)
 # yval2 = make_yval(task2, resolution, xrng)
-#
+# for t in tasks:
+#     print(make_yval(t, resolution, xrng))
 # ax1 = plt.subplot()
 # ax1.set_xticks([0, 2.3, 4, 4.5, 6, 7, 10, 11, 12, 13, 16, 19])
 # ax1.set_yticks([0, .25, .5, .75, 1])
-#
+# #
 # plt.bar(xrng, yval1, width=resolution, align="center", color='red')
 # plt.bar(xrng, yval2, width=resolution, align="center", color='blue')
 #
-# plt.show()\
+# plt.show()
+
+
+# given = np.array([[0, 3, 8, 2, 1], [1, 3, 10, 1, 1], [2, 1, 14, 1, 1]])
+# calculated = EDF.Run(given)
+#
+# # Remove all rows with only zeroes in them
+# calculated = calculated[~np.all(calculated==0, axis=1)]
+#
+# # Remove all rows where the last item is -1
+# calculated = calculated[calculated[:,-1] !=-1]
 
 
 
@@ -154,7 +238,6 @@
 # root.mainloop()
 
 
-
 # from tkinter import ttk
 # from tkinter import *
 #
@@ -231,12 +314,10 @@
 # root.mainloop()
 
 
-
 # # [[label1, instances1]
 # #  [label2, instances2]]
 # # where instances:
 # # [[start,stop,frequency], [start,stop,frequency], [start,stop,frequency]]
-
 
 
 # class Car():
@@ -409,7 +490,6 @@
 #     root.mainloop()
 
 
-
 # import numpy as np
 #
 # dat=[['0', 3, 1], ['b\n', 0, 0], ['c\n', 0, 0], ['d\n', 0, 0], ['e\n', 0, 0], ['f\n', 0, 0], ['g\n', 0, 0], ['h\n', 0, 0], ['i\n', 0, 0], ['', 0, 0], ['', 0, 0], ['', 0, 0]]
@@ -452,59 +532,63 @@
 # print(g)
 
 
+# import tkinter as tk  # python 3.x
+# # import Tkinter as tk # python 2.x
+#
+# class Example(tk.Frame):
+#
+#     def __init__(self, parent):
+#         tk.Frame.__init__(self, parent)
+#
+#         # valid percent substitutions (from the Tk entry man page)
+#         # note: you only have to register the ones you need; this
+#         # example registers them all for illustrative purposes
+#         #
+#         # %d = Type of action (1=insert, 0=delete, -1 for others)
+#         # %i = index of char string to be inserted/deleted, or -1
+#         # %P = value of the entry if the edit is allowed
+#         # %s = value of entry prior to editing
+#         # %S = the text string being inserted or deleted, if any
+#         # %v = the type of validation that is currently set
+#         # %V = the type of validation that triggered the callback
+#         #      (key, focusin, focusout, forced)
+#         # %W = the tk name of the widget
+#
+#         vcmd = (self.register(self.onValidate),
+#                 '%d', '%i', '%P', '%s', '%S', '%v', '%V', '%W')
+#         self.entry = tk.Entry(self, validate="key", validatecommand=vcmd)
+#         self.text = tk.Text(self, height=10, width=40)
+#         self.entry.pack(side="top", fill="x")
+#         self.text.pack(side="bottom", fill="both", expand=True)
+#
+#     def onValidate(self, d, i, P, s, S, v, V, W):
+#         self.text.delete("1.0", "end")
+#         self.text.insert("end","OnValidate:\n")
+#         self.text.insert("end","d='%s'\n" % d)
+#         self.text.insert("end","i='%s'\n" % i)
+#         self.text.insert("end","P='%s'\n" % P)
+#         self.text.insert("end","s='%s'\n" % s)
+#         self.text.insert("end","S='%s'\n" % S)
+#         self.text.insert("end","v='%s'\n" % v)
+#         self.text.insert("end","V='%s'\n" % V)
+#         self.text.insert("end","W='%s'\n" % W)
+#
+#         # Disallow anything but lowercase letters
+#         # if S == S.lower():
+#         #     return True
+#         if (S.isdigit()):
+#             # self.bell()
+#             return True
+#         else:
+#             self.bell()
+#             return False
+#
+# if __name__ == "__main__":
+#     root = tk.Tk()
+#     Example(root).pack(fill="both", expand=True)
+#     root.mainloop()
 
-import tkinter as tk  # python 3.x
-# import Tkinter as tk # python 2.x
 
-class Example(tk.Frame):
 
-    def __init__(self, parent):
-        tk.Frame.__init__(self, parent)
 
-        # valid percent substitutions (from the Tk entry man page)
-        # note: you only have to register the ones you need; this
-        # example registers them all for illustrative purposes
-        #
-        # %d = Type of action (1=insert, 0=delete, -1 for others)
-        # %i = index of char string to be inserted/deleted, or -1
-        # %P = value of the entry if the edit is allowed
-        # %s = value of entry prior to editing
-        # %S = the text string being inserted or deleted, if any
-        # %v = the type of validation that is currently set
-        # %V = the type of validation that triggered the callback
-        #      (key, focusin, focusout, forced)
-        # %W = the tk name of the widget
 
-        vcmd = (self.register(self.onValidate),
-                '%d', '%i', '%P', '%s', '%S', '%v', '%V', '%W')
-        self.entry = tk.Entry(self, validate="key", validatecommand=vcmd)
-        self.text = tk.Text(self, height=10, width=40)
-        self.entry.pack(side="top", fill="x")
-        self.text.pack(side="bottom", fill="both", expand=True)
-
-    def onValidate(self, d, i, P, s, S, v, V, W):
-        self.text.delete("1.0", "end")
-        self.text.insert("end","OnValidate:\n")
-        self.text.insert("end","d='%s'\n" % d)
-        self.text.insert("end","i='%s'\n" % i)
-        self.text.insert("end","P='%s'\n" % P)
-        self.text.insert("end","s='%s'\n" % s)
-        self.text.insert("end","S='%s'\n" % S)
-        self.text.insert("end","v='%s'\n" % v)
-        self.text.insert("end","V='%s'\n" % V)
-        self.text.insert("end","W='%s'\n" % W)
-
-        # Disallow anything but lowercase letters
-        # if S == S.lower():
-        #     return True
-        if (S.isdigit()):
-            # self.bell()
-            return True
-        else:
-            self.bell()
-            return False
-
-if __name__ == "__main__":
-    root = tk.Tk()
-    Example(root).pack(fill="both", expand=True)
-    root.mainloop()

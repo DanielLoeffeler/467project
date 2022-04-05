@@ -54,7 +54,7 @@ def GetValues(a,Release,x,y):
 
 def calculateFrequency(a,Release,x,y,b):
     Values=GetValues(a,Release,x,y)
-    print(Values)
+    #print(Values)
     Freq=0
     for r in range(x):
         Freq = Freq + Values[r, 0] / Values[r, 1]
@@ -108,8 +108,8 @@ def Run(a):
     for i in range(x):
         Release[i,2]=a[i,2]
         Release[i,0]=a[i,0]
-    print(a)
-    print(Release)
+    #print(a)
+    #print(Release)
 
     output=np.zeros((x*y*10,4))
     index=0
@@ -139,7 +139,7 @@ def Run(a):
 
     # Sort Release to put earliest deadline first that has released
     Release = sortitmotherfucker(Release)
-    print(Release)
+    #print(Release)
     #check if we have anything to run
     while checkfinished(Release,x,y):
         if checkRelease(Release,x):
@@ -211,8 +211,8 @@ def Run(a):
                 temp=int(Release[0,1]+3)
                 Release[0,4] = (output[index-1,1] - output[index-1,0])
                 ReleaseNext(Release,x)
-            print(Release)
-            print(output)
+            #print(Release)
+            #print(output)
     return output
 
 """
@@ -279,4 +279,5 @@ elif index < x:
 
 
 
-print(Run(a))
+# x=Run(a)
+# print(x)
