@@ -38,7 +38,7 @@ for the ranges where a task is (between start and stop) , fill that range with t
 
 
 
-def dopl(given, calculated, resolution, endpoint):
+def dopl(given, calculated, resolution, endpoint, ltn, lk):
     def make_yval(ranges, res, xrange):
         # Takes the instance array and returns an array containing the frequency values for each unit of time
         # between the start and the stop
@@ -93,10 +93,15 @@ def dopl(given, calculated, resolution, endpoint):
     for index, value in enumerate(yticks):
         plt.text(yxpos[index], value,str(value))
 
+    names=[]
+    for index, x in enumerate(given):
+        names.append(str(ltn[lk[index]]))  # Replaces each label assigned number with its label
+
+    plt.legend(names, loc='upper right')
     plt.xticks(rotation=90)
     plt.show()
 
-def runprog(givene):
+def runprog(givene, ltn, lk):
     calculatede = EDF.Run(givene)
 
     # Remove all rows with only zeroes in them
@@ -109,15 +114,17 @@ def runprog(givene):
 
     endpointe = ceil(calculatede[-1,-3])+1
 
-    dopl(givene, calculatede, resolutione, endpointe)
+    dopl(givene, calculatede, resolutione, endpointe, ltn, lk)
 
 given = np.array([[0, 3, 8, 2, 1],
                   [1, 3, 10, 1, 1],
                   [2, 1, 14, 1, 1]])
 # givene=np.array([[0,3,8,2,1],[1,5,50,5,1],[2,2,14,2,1]])
 
+labeltonumber = {0: 'a', 1: 'b', 2: 'c'}
+labelkeys = range(0, 3)
 
-runprog(given)
+runprog(given, labeltonumber, labelkeys)
 
 # print(hold)
 # tasks = np.array([[0, 2.3, 1, 0],

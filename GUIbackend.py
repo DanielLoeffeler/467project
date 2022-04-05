@@ -225,7 +225,7 @@ class Newtreeview():
 			# self.bell()
 			return False
 
-	def makegraph(self, given, calculated, resolution, endpoint):
+	def makegraph(self, given, calculated, resolution, endpoint, ltn, lk):
 		def make_yval(ranges, res, xrange):
 			# Takes the instance array and returns an array containing the frequency values for each unit of time
 			# between the start and the stop
@@ -272,6 +272,14 @@ class Newtreeview():
 		for item in calculated:
 			yxpos.append(item[0])
 
+		# for index, x in enumerate(given):
+		#     x[0] = self.labeltonumber[self.labelkeys[index]] # Replaces each label assigned number with its label
+
+		names = []
+		for index, x in enumerate(given):
+			names.append(str(ltn[lk[index]]))  # Replaces each label assigned number with its label
+		print(names)
+
 		# Add each task array to the plot with a unique colour
 		for index, tasklist in enumerate(hold):
 			yvals = make_yval(tasklist, resolution, xrng)
@@ -280,6 +288,7 @@ class Newtreeview():
 		for index, value in enumerate(yticks):
 			plt.text(yxpos[index], value, str(value))
 
+		plt.legend(names, loc='top right')
 		plt.xticks(rotation=90)
 		plt.show()
 
@@ -296,8 +305,8 @@ class Newtreeview():
 		# Remove all rows where the last item is -1
 		calculatede = calculatede[calculatede[:, -1] != -1]
 
-		resolutione = 0.005
+		resolutione = 0.001
 
 		endpointe = ceil(calculatede[-1,-3])+1
 
-		self.makegraph(self.treedata, calculatede, resolutione, endpointe)
+		self.makegraph(self.treedata, calculatede, resolutione, endpointe, self.labeltonumber, self.labelkeys)
