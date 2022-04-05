@@ -71,7 +71,8 @@ Cleardat_B = tk.Button(
 Run_B = tk.Button(
     mainframe,
     text='Run simulation',
-    bg='forest green'
+    bg='forest green',
+    command=lambda: ntree. createplot(freqvar.get())
 )
 
 Addinvoccol_B.grid(column=2, row=1, sticky='ew')
@@ -80,15 +81,9 @@ Savedat_B.grid(column=1, row=2, sticky='ew')
 Cleardat_B.grid(column=2, row=2, sticky='ew')
 Run_B.grid(column=0, row=3, sticky='ew')
 
-printvalues_B = tk.Button(
-    mainframe,
-    text='print',
-    command=lambda: ntree.getvalues()
-)
-printvalues_B.grid(column=0, row=4)
-
 # Frequency Checkbox
-FixFreq = tk.Checkbutton(mainframe, text='Fix Frequency')
+freqvar = tk.IntVar()
+FixFreq = tk.Checkbutton(mainframe, text='Fix Frequency', variable=freqvar)
 FixFreq.grid(column=1, row=3)
 
 ntree.tree.bind('<Double-1>', ntree.set_cell_value)

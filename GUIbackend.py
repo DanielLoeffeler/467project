@@ -4,6 +4,9 @@ The backend functionality of the GUI
 import tkinter as tk
 from tkinter import ttk
 import numpy as np
+import Math as EDF
+import matplotlib.pyplot as plt
+from math import ceil
 
 class Newtreeview():
 	"""ttk treeview but with some more methods to control the amount of columns there are"""
@@ -12,9 +15,9 @@ class Newtreeview():
 		self.frame = frame
 		self.columns = columns
 		self.show = show
-		self.treedata = np.array([[0,1,1],[1,2,2], [2,3,3], [3,4,4], [4,5,5]])
-		self.labeltonumber = {0: 'a', 1: 'b', 2: 'c', 3: 'd', 4: 'e'}
-		self.labelkeys = range(0, 5)
+		self.treedata = np.array([[0, 3, 8, 2, 1],[1, 3, 10, 1, 1],[2, 1, 14, 1, 1]])
+		self.labeltonumber = {0: 'a', 1: 'b', 2: 'c'}
+		self.labelkeys = range(0, 3)
 		self.tree = ttk.Treeview(frame, columns=columns, show=show)
 		self.vcmd = (self.frame.register(self.onValidate),
 		        '%d', '%i', '%P', '%s', '%S', '%v', '%V', '%W')
@@ -115,9 +118,9 @@ class Newtreeview():
 		# Transfer the data list into the numpy array standard for run time
 		# # [[label1, worstcom1, period1, invocations1],
 		# #  [label2, worstcom2, period2, invocations2]]
-		print(len(data),len(self.treedata[0]))
+		#print(len(data),len(self.treedata[0]))
 		ndat = np.zeros((len(data), len(self.treedata[0])))
-		print(ndat.shape)
+		#print(ndat.shape)
 		try:
 			for index1, x in enumerate(ndat):
 				for index2, y in enumerate(data[index1]):
@@ -130,7 +133,7 @@ class Newtreeview():
 			print("fill all the columns")
 		except ValueError:
 			print("only have int values in there boi")
-		print(self.treedata)
+		#print(self.treedata)
 
 	def setinvoccol(self, invocs):
 		"""Sets the amount of invocation columns to the given amount"""
@@ -165,7 +168,7 @@ class Newtreeview():
 			item_text = self.tree.item(item, "values")
 			column = self.tree.identify_column(event.x)
 			row = self.tree.identify_row(event.y)
-		print(column, row)
+		#print(column, row)
 		cn = int(str(column).replace('#', ''),16)
 		rn = int(str(row).replace('I', ''),16)
 
@@ -176,7 +179,7 @@ class Newtreeview():
 				colwidths = 0
 			else:
 				colwidths += self.tree.column(co)['width']
-		print(cn,rn)
+		#print(cn,rn)
 		# Makes an entry form at the width of the column, that only allows numbers in any column after the first
 		if cn>1:
 			entryedit = tk.Entry(self.frame,
@@ -222,7 +225,79 @@ class Newtreeview():
 			# self.bell()
 			return False
 
+	def makegraph(self, given, calculated, resolution, endpoint):
+		def make_yval(ranges, res, xrange):
+			# Takes the instance array and returns an array containing the frequency values for each unit of time
+			# between the start and the stop
+			taskval = np.zeros(xrange.size)
 
-def createplot(stuff):
-	# Creates the shit
-	pass
+			for i, item in enumerate(ranges):
+				taskval[int(item[0] // res):int(item[1] // res)] = item[2]
+				#print(int(item[0] // res))
+			return taskval
+
+		# Makes all the poitn on x axis for data
+		xrng = np.arange(0, endpoint, resolution)
+
+		# Take calculated result and break it into one 3D array where each array one step in is all one task
+		hold = np.zeros((given.shape[0], given.shape[1] - 3, 3))
+
+		for taskamt in range(given.shape[0]):
+			# for invocamt in range(given.shape[1]-3):
+			for index, x in enumerate(calculated[calculated[:, -1] == taskamt]):
+				hold[taskamt, index] = x[0:3]
+
+		colourlist = ['b', 'g', 'r', 'c', 'm', 'y', 'k', 'w']
+		yvals = []
+
+		ax1 = plt.subplot()
+		#print(calculated)
+		# extract all the xticks from calculated array
+		xticks = []
+		for item in calculated:
+			for x in range(2):
+				# print(item[x])
+				xticks.append(item[x])
+		# xticks=[round(num, 1) for num in xticks]
+		ax1.set_xticks(xticks, rotation=45)
+
+		# extracts all the yticks from calculated array
+		yticks = []
+		for item in calculated:
+			yticks.append(item[2])
+		yticks = [round(num, 2) for num in yticks]
+		ax1.set_yticks(yticks)
+
+		yxpos = []
+		for item in calculated:
+			yxpos.append(item[0])
+
+		# Add each task array to the plot with a unique colour
+		for index, tasklist in enumerate(hold):
+			yvals = make_yval(tasklist, resolution, xrng)
+			plt.bar(xrng, yvals, width=resolution, align="center", color=colourlist[index])
+
+		for index, value in enumerate(yticks):
+			plt.text(yxpos[index], value, str(value))
+
+		plt.xticks(rotation=90)
+		plt.show()
+
+	def createplot(self, freqflag):
+		# Creates the shit
+		self.getvalues()
+		# print(self.treedata,freqflag)
+
+		calculatede = EDF.Run(self.treedata)
+
+		# Remove all rows with only zeroes in them
+		calculatede = calculatede[~np.all(calculatede == 0, axis=1)]
+
+		# Remove all rows where the last item is -1
+		calculatede = calculatede[calculatede[:, -1] != -1]
+
+		resolutione = 0.005
+
+		endpointe = ceil(calculatede[-1,-3])+1
+
+		self.makegraph(self.treedata, calculatede, resolutione, endpointe)

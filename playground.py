@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import Math as EDF
+from math import ceil
 
 # [[label1, worstcom1, period1, invocations1,1, invocations1,2],
 #  [label2, worstcom2, period2, invocations2,1, invocations2,2]]
@@ -80,13 +81,18 @@ def dopl(given, calculated, resolution, endpoint):
     yticks = [round(num, 2) for num in yticks]
     ax1.set_yticks(yticks)
 
+    yxpos=[]
+    for item in calculated:
+        yxpos.append(item[0])
+
     # Add each task array to the plot with a unique colour
     for index, tasklist in enumerate(hold):
         yvals=make_yval(tasklist, resolution, xrng)
         plt.bar(xrng, yvals, width=resolution, align="center", color=colourlist[index])
 
     for index, value in enumerate(yticks):
-        plt.text(index, value,str(value))
+        plt.text(yxpos[index], value,str(value))
+
     plt.xticks(rotation=90)
     plt.show()
 
@@ -99,8 +105,9 @@ def runprog(givene):
     # Remove all rows where the last item is -1
     calculatede = calculatede[calculatede[:, -1] != -1]
 
-    resolutione = 0.005
-    endpointe = 20
+    resolutione = 0.1
+
+    endpointe = ceil(calculatede[-1,-3])+1
 
     dopl(givene, calculatede, resolutione, endpointe)
 
