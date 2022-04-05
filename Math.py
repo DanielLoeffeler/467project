@@ -5,7 +5,8 @@ This code runs the math behind the system
 """
 import numpy as np
 
-a = np.array([[0,3,8,2,1,3],[1,5,100,5,1,2],[2,2,14,2,1,1]])
+a = np.array([[0,5,8,2,1,3],[1,5,100,5,1,2],[2,2,14,2,1,1]])
+z=1
 
 def sortit(a):
     i=0
@@ -52,12 +53,21 @@ def GetValues(a,Release,x,y):
     return Value
 
 
-def calculateFrequency(a,Release,x,y,b):
+def calculateFrequency(a,Release,x,y,z):
     Values=GetValues(a,Release,x,y)
     print(Values)
     Freq=0
     for r in range(x):
         Freq = Freq + Values[r, 0] / Values[r, 1]
+    if z==1:
+        a=0.5
+        for i in range(3):
+            temp = Freq-a
+            if temp<0:
+                Freq=a
+                return Freq
+            a=a+0.25
+
     return Freq
 
 def CheckNextRelease(Release,TF,x):
@@ -100,7 +110,7 @@ def checkRelease(Release,x):
             return 0
     return 1
 
-def Run(a):
+def Run(a,z):
     #Initial sorting function to sort earliest deadline first
     a=sortit(a)
     i=0
@@ -118,8 +128,12 @@ def Run(a):
     R=0
     finish=0
     Freq=0
+    """
     for r in range(x):
         Freq = Freq + a[r, 1] / a[r, 2]
+    """
+    Freq=calculateFrequency(a,Release,x,y,z)
+
     if Freq > 1:
         return -1
     else:
@@ -154,7 +168,7 @@ def Run(a):
             b=-1
 
             # Calculate the Waiting Frequency cause we can
-            Freq=calculateFrequency(a,Release,x,y,b)
+            Freq=calculateFrequency(a,Release,x,y,z)
 
             # Update the output to reflect that we are waiting
             output=assignoutput(a,b,output,Freq,TF,index)
@@ -173,7 +187,7 @@ def Run(a):
             b=findnext(a,Release,x)
 
             # Calculate the Frequency based on current system state
-            Freq=calculateFrequency(a,Release,x,y,b)
+            Freq=calculateFrequency(a,Release,x,y,z)
 
             #Prepare to run next iteration
             c= int(Release[0,1])+3
@@ -281,4 +295,4 @@ elif index < x:
 
 
 
-print(Run(a))
+print(Run(a,z))
