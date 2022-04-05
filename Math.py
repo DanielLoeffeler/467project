@@ -5,9 +5,10 @@ This code runs the math behind the system
 """
 import numpy as np
 
-a = np.array([[0,3,8,2,1],[1,5,50,5,1],[2,2,14,2,1]])
+a = np.array([[0,5,8,2,1,3],[1,5,100,5,1,2],[2,2,14,2,1,1]])
+z=1
 
-def sortitmotherfucker(a):
+def sortit(a):
     i=0
     order = 1
     x = a.shape[0]
@@ -52,22 +53,32 @@ def GetValues(a,Release,x,y):
     return Value
 
 
-def calculateFrequency(a,Release,x,y,b):
+def calculateFrequency(a,Release,x,y,z):
     Values=GetValues(a,Release,x,y)
-    #print(Values)
+    print(Values)
     Freq=0
     for r in range(x):
         Freq = Freq + Values[r, 0] / Values[r, 1]
+    if z==1:
+        a=0.5
+        for i in range(3):
+            temp = Freq-a
+            if temp<0:
+                Freq=a
+                return Freq
+            a=a+0.25
+
     return Freq
 
 def CheckNextRelease(Release,TF,x):
     for i in range(x):
         if Release[i,3]==-1:
-            if TF <= Release[i,2]:
+            if TF <= Release[i , 2]:
                 return TF
             else:
-                t=Release[i,2]
-                return t
+                temp = Release[i , 2]
+                return temp
+    return TF
 
 def assignoutput(a,b,output,Freq,TF,index):
     output[index, 2] = Freq
@@ -84,6 +95,7 @@ def ReleaseNext(Release,x):
     for i in range(x):
         if Release[i,3]==-1:
             Release[i,3]=0
+            Release[i,2]=Release[i,2]*(Release[i,1]+1)
             return Release
 
 def checkfinished(Release,x,y):
@@ -98,9 +110,9 @@ def checkRelease(Release,x):
             return 0
     return 1
 
-def Run(a):
+def Run(a,z):
     #Initial sorting function to sort earliest deadline first
-    a=sortitmotherfucker(a)
+    a=sortit(a)
     i=0
     x = a.shape[0]
     y = a.shape[1] - 3
@@ -108,16 +120,20 @@ def Run(a):
     for i in range(x):
         Release[i,2]=a[i,2]
         Release[i,0]=a[i,0]
-    #print(a)
-    #print(Release)
+    print(a)
+    print(Release)
 
-    output=np.zeros((x*y*10,4))
+    output=np.zeros((x*x*y*2,4))
     index=0
     R=0
     finish=0
     Freq=0
+    """
     for r in range(x):
         Freq = Freq + a[r, 1] / a[r, 2]
+    """
+    Freq=calculateFrequency(a,Release,x,y,z)
+
     if Freq > 1:
         return -1
     else:
@@ -132,19 +148,19 @@ def Run(a):
 
         if Release[0,1]>y:
             Release[0,2]=-1
-        Release=sortitmotherfucker(Release)
+        Release=sortit(Release)
 
 
 
 
     # Sort Release to put earliest deadline first that has released
-    Release = sortitmotherfucker(Release)
-    #print(Release)
+    Release = sortit(Release)
+    print(Release)
     #check if we have anything to run
     while checkfinished(Release,x,y):
         if checkRelease(Release,x):
             # Ensure earliest deadline task is next to run.
-            sortitmotherfucker(Release)
+            sortit(Release)
             # Set end time equal to start of next release
             TF=Release[0,2]
 
@@ -152,7 +168,7 @@ def Run(a):
             b=-1
 
             # Calculate the Waiting Frequency cause we can
-            Freq=calculateFrequency(a,Release,x,y,b)
+            Freq=calculateFrequency(a,Release,x,y,z)
 
             # Update the output to reflect that we are waiting
             output=assignoutput(a,b,output,Freq,TF,index)
@@ -165,13 +181,13 @@ def Run(a):
 
         else:
             # Ensure first task is next task to run
-            sortitmotherfucker(Release)
+            sortit(Release)
 
             # Find associate row of a to first row of Release
             b=findnext(a,Release,x)
 
             # Calculate the Frequency based on current system state
-            Freq=calculateFrequency(a,Release,x,y,b)
+            Freq=calculateFrequency(a,Release,x,y,z)
 
             #Prepare to run next iteration
             c= int(Release[0,1])+3
@@ -189,7 +205,7 @@ def Run(a):
 
             #Check if the task will finish before the next task releases
             TF=CheckNextRelease(Release,TF,x)
-
+            TF
             #update output regardless of task finishing successfully or not
             output = assignoutput(a, b, output, Freq, TF, index)
 
@@ -209,10 +225,10 @@ def Run(a):
             # For when they did not match up and the previous task did not finish running
             else:
                 temp=int(Release[0,1]+3)
-                Release[0,4] = (output[index-1,1] - output[index-1,0])
+                Release[0,4] = a[b,c]-(output[index-1,1] - output[index-1,0])*Freq
                 ReleaseNext(Release,x)
-            #print(Release)
-            #print(output)
+            print(Release)
+            print(output)
     return output
 
 """
@@ -279,5 +295,4 @@ elif index < x:
 
 
 
-x=Run(a)
-print(x)
+print(Run(a,z))
