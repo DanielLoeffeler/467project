@@ -233,7 +233,7 @@ class Newtreeview():
 
 			for i, item in enumerate(ranges):
 				taskval[int(item[0] // res):int(item[1] // res)] = item[2]
-				#print(int(item[0] // res))
+				print(int(item[0] // res))
 			return taskval
 
 		# Makes all the poitn on x axis for data

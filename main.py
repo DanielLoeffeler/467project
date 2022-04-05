@@ -83,7 +83,7 @@ Run_B.grid(column=0, row=3, sticky='ew')
 
 # Frequency Checkbox
 freqvar = tk.IntVar()
-FixFreq = tk.Checkbutton(mainframe, text='Fix Frequency', variable=freqvar)
+FixFreq = tk.Checkbutton(mainframe, text='Fix Frequencies to 1Fmax, .75Fmax, and .5Fmax', variable=freqvar)
 FixFreq.grid(column=1, row=3)
 
 ntree.tree.bind('<Double-1>', ntree.set_cell_value)
