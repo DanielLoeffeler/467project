@@ -177,15 +177,21 @@ class Newtreeview():
 			else:
 				colwidths += self.tree.column(co)['width']
 		print(cn,rn)
-		# Makes an entry form at the width of the column
-		entryedit = tk.Entry(self.frame,
-		                    width=self.tree.column(cn - 1)['width'] // 7,
-		                    # height=1,
-		                    font=("consolas", 10),
-		                    validate='key',
-		                    validatecommand=self.vcmd)
-		entryedit.place(x=colwidths, y=11 + rn * 20)
+		# Makes an entry form at the width of the column, that only allows numbers in any column after the first
+		if cn>1:
+			entryedit = tk.Entry(self.frame,
+			                    width=self.tree.column(cn - 1)['width'] // 7,
+			                    # height=1,
+			                    font=("consolas", 10),
+			                    validate='key',
+			                    validatecommand=self.vcmd)
+		else:
+			entryedit = tk.Entry(self.frame,
+			                    width=self.tree.column(cn - 1)['width'] // 7,
+			                    # height=1,
+			                    font=("consolas", 10))
 
+		entryedit.place(x=colwidths, y=11 + rn * 20)
 		def saveedit():
 			self.tree.set(item, column=column, value=entryedit.get())
 			entryedit.destroy()
