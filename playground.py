@@ -1,8 +1,8 @@
 # import numpy as np
 # import matplotlib.pyplot as plt
 #
-# # [[label1, worstcom1, period1, invocations1],
-# #  [label2, worstcom2, period2, invocations2]]
+# # [[label1, worstcom1, period1, invocations1,1, invocations1,2],
+# #  [label2, worstcom2, period2, invocations2,1, invocations2,2]]
 # # [[frequencies]]
 #
 # # [[label1, instances1]
@@ -407,11 +407,104 @@
 #
 # if __name__ == '__main__':
 #     root.mainloop()
-import numpy as np
 
-dat=[[1, '', ''], [2, '', ''], [3, '', ''], [4, '', ''], [5, '', ''], [6, '', ''], [7, '', ''], [8, '', ''], [9, '', ''], '', '', '']
-date=[]
-for x in dat:
-    if x:
-        date.append(x)
-print(len(date))
+
+
+# import numpy as np
+#
+# dat=[['0', 3, 1], ['b\n', 0, 0], ['c\n', 0, 0], ['d\n', 0, 0], ['e\n', 0, 0], ['f\n', 0, 0], ['g\n', 0, 0], ['h\n', 0, 0], ['i\n', 0, 0], ['', 0, 0], ['', 0, 0], ['', 0, 0]]
+# data=[]
+#
+# # makes a new list with only rows that have data, and strips \n character
+# for x in dat:
+#     if x[0]:
+#         x[0]=str(x[0]).strip('\n')
+#         data.append(x)
+#
+# # makes a dictionary where each label gets assigned a unique number
+# labeltonumber = {}
+# labelkeys = range(len(data))
+# for i in labelkeys:
+#     labeltonumber[i] = data[i][0]
+#
+# print(labeltonumber)
+# print(len(data),len(dat[0]))
+#
+# # replaces each label with its assigned number
+# for index, x in enumerate(data):
+#     x[0] = labelkeys[index]
+#
+# # replaces each label assigned number with its label
+# # for index, x in enumerate(data):
+# #     x[0] = labeltonumber[labelkeys[index]]
+#
+# # Transfer the data list into the numpy array standard for run time
+# # # [[label1, worstcom1, period1, invocations1],
+# # #  [label2, worstcom2, period2, invocations2]]
+# ndat=np.zeros((len(data),len(dat[0])))
+# for index1, x in enumerate(ndat):
+#     for index2, y in enumerate(data[index1]):
+#         x[index2]=y
+#
+# print(labelkeys[0])
+#
+# g=np.array([[0,0,0],[1,0,0], [2,0,0], [3,0,0], [4,0,0]])
+# print(g)
+
+
+
+import tkinter as tk  # python 3.x
+# import Tkinter as tk # python 2.x
+
+class Example(tk.Frame):
+
+    def __init__(self, parent):
+        tk.Frame.__init__(self, parent)
+
+        # valid percent substitutions (from the Tk entry man page)
+        # note: you only have to register the ones you need; this
+        # example registers them all for illustrative purposes
+        #
+        # %d = Type of action (1=insert, 0=delete, -1 for others)
+        # %i = index of char string to be inserted/deleted, or -1
+        # %P = value of the entry if the edit is allowed
+        # %s = value of entry prior to editing
+        # %S = the text string being inserted or deleted, if any
+        # %v = the type of validation that is currently set
+        # %V = the type of validation that triggered the callback
+        #      (key, focusin, focusout, forced)
+        # %W = the tk name of the widget
+
+        vcmd = (self.register(self.onValidate),
+                '%d', '%i', '%P', '%s', '%S', '%v', '%V', '%W')
+        self.entry = tk.Entry(self, validate="key", validatecommand=vcmd)
+        self.text = tk.Text(self, height=10, width=40)
+        self.entry.pack(side="top", fill="x")
+        self.text.pack(side="bottom", fill="both", expand=True)
+
+    def onValidate(self, d, i, P, s, S, v, V, W):
+        self.text.delete("1.0", "end")
+        self.text.insert("end","OnValidate:\n")
+        self.text.insert("end","d='%s'\n" % d)
+        self.text.insert("end","i='%s'\n" % i)
+        self.text.insert("end","P='%s'\n" % P)
+        self.text.insert("end","s='%s'\n" % s)
+        self.text.insert("end","S='%s'\n" % S)
+        self.text.insert("end","v='%s'\n" % v)
+        self.text.insert("end","V='%s'\n" % V)
+        self.text.insert("end","W='%s'\n" % W)
+
+        # Disallow anything but lowercase letters
+        # if S == S.lower():
+        #     return True
+        if (S.isdigit()):
+            # self.bell()
+            return True
+        else:
+            self.bell()
+            return False
+
+if __name__ == "__main__":
+    root = tk.Tk()
+    Example(root).pack(fill="both", expand=True)
+    root.mainloop()
