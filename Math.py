@@ -123,7 +123,7 @@ def Run(a,z):
     print(a)
     print(Release)
 
-    output=np.zeros((x*y*10,4))
+    output=np.zeros((x*x*y*2,4))
     index=0
     R=0
     finish=0
