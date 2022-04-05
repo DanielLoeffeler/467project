@@ -15,9 +15,9 @@ class Newtreeview():
 		self.frame = frame
 		self.columns = columns
 		self.show = show
-		self.treedata = np.array([[0, 3, 8, 2, 1],[1, 3, 10, 1, 1],[2, 1, 14, 1, 1]])
-		self.labeltonumber = {0: 'a', 1: 'b', 2: 'c'}
-		self.labelkeys = range(0, 3)
+		self.treedata = []
+		self.labeltonumber = {}
+		self.labelkeys = ''
 		self.tree = ttk.Treeview(frame, columns=columns, show=show)
 		self.vcmd = (self.frame.register(self.onValidate),
 		        '%d', '%i', '%P', '%s', '%S', '%v', '%V', '%W')
