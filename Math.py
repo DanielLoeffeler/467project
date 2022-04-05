@@ -7,7 +7,7 @@ import numpy as np
 
 a = np.array([[0,3,8,2,1],[1,5,50,5,1],[2,2,14,2,1]])
 
-def sortitmotherfucker(a):
+def sortit(a):
     i=0
     order = 1
     x = a.shape[0]
@@ -100,7 +100,7 @@ def checkRelease(Release,x):
 
 def Run(a):
     #Initial sorting function to sort earliest deadline first
-    a=sortitmotherfucker(a)
+    a=sortit(a)
     i=0
     x = a.shape[0]
     y = a.shape[1] - 3
@@ -132,19 +132,19 @@ def Run(a):
 
         if Release[0,1]>y:
             Release[0,2]=-1
-        Release=sortitmotherfucker(Release)
+        Release=sortit(Release)
 
 
 
 
     # Sort Release to put earliest deadline first that has released
-    Release = sortitmotherfucker(Release)
+    Release = sortit(Release)
     print(Release)
     #check if we have anything to run
     while checkfinished(Release,x,y):
         if checkRelease(Release,x):
             # Ensure earliest deadline task is next to run.
-            sortitmotherfucker(Release)
+            sortit(Release)
             # Set end time equal to start of next release
             TF=Release[0,2]
 
@@ -165,7 +165,7 @@ def Run(a):
 
         else:
             # Ensure first task is next task to run
-            sortitmotherfucker(Release)
+            sortit(Release)
 
             # Find associate row of a to first row of Release
             b=findnext(a,Release,x)
