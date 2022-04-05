@@ -5,7 +5,7 @@ This code runs the math behind the system
 """
 import numpy as np
 
-a = np.array([[0,3,8,2,1],[1,5,50,5,1],[2,2,14,2,1]])
+a = np.array([[0,3,8,2,1,3],[1,5,100,5,1,2],[2,2,14,2,1,1]])
 
 def sortit(a):
     i=0
@@ -63,11 +63,12 @@ def calculateFrequency(a,Release,x,y,b):
 def CheckNextRelease(Release,TF,x):
     for i in range(x):
         if Release[i,3]==-1:
-            if TF <= Release[i,2]:
+            if TF <= Release[i , 2]:
                 return TF
             else:
-                t=Release[i,2]
-                return t
+                temp = Release[i , 2]
+                return temp
+    return TF
 
 def assignoutput(a,b,output,Freq,TF,index):
     output[index, 2] = Freq
@@ -84,6 +85,7 @@ def ReleaseNext(Release,x):
     for i in range(x):
         if Release[i,3]==-1:
             Release[i,3]=0
+            Release[i,2]=Release[i,2]*(Release[i,1]+1)
             return Release
 
 def checkfinished(Release,x,y):
@@ -189,7 +191,7 @@ def Run(a):
 
             #Check if the task will finish before the next task releases
             TF=CheckNextRelease(Release,TF,x)
-
+            TF
             #update output regardless of task finishing successfully or not
             output = assignoutput(a, b, output, Freq, TF, index)
 
@@ -209,7 +211,7 @@ def Run(a):
             # For when they did not match up and the previous task did not finish running
             else:
                 temp=int(Release[0,1]+3)
-                Release[0,4] = (output[index-1,1] - output[index-1,0])
+                Release[0,4] = a[b,c]-(output[index-1,1] - output[index-1,0])*Freq
                 ReleaseNext(Release,x)
             print(Release)
             print(output)
