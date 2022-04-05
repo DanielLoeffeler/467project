@@ -288,7 +288,7 @@ class Newtreeview():
 		for index, value in enumerate(yticks):
 			plt.text(yxpos[index], value, str(value))
 
-		plt.legend(names, loc='top right')
+		plt.legend(names, loc='upper right')
 		plt.xticks(rotation=90)
 		plt.show()
 
@@ -297,7 +297,7 @@ class Newtreeview():
 		self.getvalues()
 		# print(self.treedata,freqflag)
 
-		calculatede = EDF.Run(self.treedata)
+		calculatede = EDF.Run(self.treedata, freqflag)
 
 		# Remove all rows with only zeroes in them
 		calculatede = calculatede[~np.all(calculatede == 0, axis=1)]
@@ -305,7 +305,7 @@ class Newtreeview():
 		# Remove all rows where the last item is -1
 		calculatede = calculatede[calculatede[:, -1] != -1]
 
-		resolutione = 0.001
+		resolutione = 0.005
 
 		endpointe = ceil(calculatede[-1,-3])+1
 
