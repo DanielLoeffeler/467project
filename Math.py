@@ -9,9 +9,10 @@ Output
 """
 import numpy as np
 
-a = np.array([[0,9,8,0,9,1],[1,3,10,0,1,1],[2,1,14,0,1,1]])
+a = np.array([[0,3,8,0,2,1],[1,3,10,1,1,1],[2,1,14,0,1,1]])
 #a = np.array([[0,9,8,0,9,1]])
 z=0
+Tend=-1
 
 def sortit(a):
     i=0
@@ -75,7 +76,11 @@ def calculateFrequency(a,Release,x,y,z):
 
     return Freq
 
-def CheckNextRelease(Release,TF,x):
+def CheckNextRelease(Release,TF,x,Tend):
+    if TF>=Tend and Tend!=-1:
+        TF=Tend
+        return TF
+
     for i in range(x):
         if Release[i,3]==-1:
             if TF <= Release[i , 2]:
@@ -117,6 +122,8 @@ def checkfinished(Release,x,y):
     for i in range(x):
         if Release[i,1]!=y:
             return 1
+        elif Release[i,0]==-1 and Release[i,2]==0:
+            return 0
     return 0
 
 def checkRelease(Release,x):
@@ -141,7 +148,7 @@ def errorHandle(Release,output,x,index):
             Release[i, 2] = Release[i, 2] + a[R, 2] * (Release[i, 1] + 1)
             Release[i,1]+=1
 
-def Run(a,z):
+def Run(a,z,Tend):
     #Initial sorting function to sort earliest deadline first
     a=sortit(a)
     i=0
@@ -149,7 +156,9 @@ def Run(a,z):
     y = a.shape[1] - 4
 
     # Release=[Tag, iteration,Deadline, Release flag, Time remaining on previous iteration]
+
     Release=np.zeros((x,5))
+
     for i in range(x):
         # determining if the task is released at zero or not
         if a[i,3]==0:
@@ -163,6 +172,7 @@ def Run(a,z):
         # Coordinate the tag between the release and input data
         Release[i,0]=a[i,0]
     #Sort the Release to reorder for unreleased tasks
+
     sortit(Release)
 
     print(a)
@@ -195,7 +205,7 @@ def Run(a,z):
     # Save the time temporarily
     temp = TF
     #Check if the task ran to completion
-    TF = CheckNextRelease(Release, TF, x)
+    TF = CheckNextRelease(Release, TF, x,Tend)
 
     output[0,3]=Release[0,0]
     output[0,0]=0
@@ -236,7 +246,8 @@ def Run(a,z):
                 if Release[i,1]>=y:
                     Release[0,2]=np.max(Release)*(y+1)+1
                     Release[i,3]=-1
-
+        if TF==Tend and Tend!=-1:
+            return output
 
         if checkRelease(Release,x):
             # Ensure earliest deadline task is next to run.
@@ -290,7 +301,7 @@ def Run(a,z):
             temp=TF
 
             #Check if the task will finish before the next task releases
-            TF=CheckNextRelease(Release,TF,x)
+            TF=CheckNextRelease(Release,TF,x,Tend)
 
             #update output regardless of task finishing successfully or not
             output = assignoutput(a, b, output, Freq, TF, index)
@@ -309,6 +320,7 @@ def Run(a,z):
                 # Check if that was the last iteration to run
                 if Release[0,1]>=y:
                     Release[0,2]=np.max(Release)*(y+1)+1
+
             # For when they did not match up and the previous task did not finish running
             else:
                 temp=int(Release[0,1]+3)
@@ -382,4 +394,4 @@ elif index < x:
 
 
 
-print(Run(a,z))
+print(Run(a,z,Tend))
