@@ -14,6 +14,7 @@ class Newtreeview():
 	def __init__(self, frame, columns, show):
 		self.frame = frame
 		self.columns = columns
+		self.defaultcolumns = columns
 		self.show = show
 		self.treedata = []
 		self.labeltonumber = {}
@@ -92,8 +93,8 @@ class Newtreeview():
 
 	def getvalues(self):
 		"""Creates a numpy array storing all of the information in the tree"""
-		# # [[label1, worstcom1, period1, invocations11, invocations12],
-		# #  [label2, worstcom2, period2, invocations21, invocations22]]
+		# # [[label1, worstcom1, period1, ,releasetime1 , invocations11, invocations12],
+		# #  [label2, worstcom2, period2, ,releasetime1 ,invocations21, invocations22]]
 		self.treedata = []
 		for index, line in enumerate(self.tree.get_children()):
 			self.treedata.append(self.tree.item(line)['values'])
@@ -116,8 +117,8 @@ class Newtreeview():
 			x[0] = self.labelkeys[index]
 
 		# Transfer the data list into the numpy array standard for run time
-		# # [[label1, worstcom1, period1, invocations1],
-		# #  [label2, worstcom2, period2, invocations2]]
+		# # [[label1, worstcom1, period1, release1, invocations1],
+		# #  [label2, worstcom2, period2, release2, invocations2]]
 		#print(len(data),len(self.treedata[0]))
 		ndat = np.zeros((len(data), len(self.treedata[0])))
 		#print(ndat.shape)
@@ -125,7 +126,9 @@ class Newtreeview():
 			for index1, x in enumerate(ndat):
 				for index2, y in enumerate(data[index1]):
 					if y == '\n': # If number field is left empty make it a zero
-						y=0
+						y = 0
+					if y == '': # If the field is left blank make it zero
+						y = 0
 					x[index2] = y
 
 			self.treedata=ndat
@@ -133,11 +136,11 @@ class Newtreeview():
 			print("fill all the columns")
 		except ValueError:
 			print("only have int values in there boi")
-		#print(self.treedata)
+		print(self.treedata)
 
 	def setinvoccol(self, invocs):
 		"""Sets the amount of invocation columns to the given amount"""
-		self.columns = ['Task', 'Worst time', 'Period']
+		self.columns = list(self.defaultcolumns)
 		self.columns.extend(list(np.arange(1, invocs + 1)))
 
 		self.getvalues() # Saves the values of the current table
@@ -149,12 +152,12 @@ class Newtreeview():
 			self.tree.column(item, stretch=True, width=100, minwidth=100)
 			self.tree.heading(item, text=item)
 
-		for index, item in enumerate(self.columns[3:]):
+		for index, item in enumerate(self.columns[4:]):
 			index = 3 + index
 			self.tree.column(index, stretch=True, width=100, minwidth=100)
 			self.tree.heading(item, text='invocation ' + str(index - 2))
 
-		self.tree.grid(column=0, row=0, sticky='new', columnspan=invocs + 3)
+		self.tree.grid(column=0, row=0, sticky='new', columnspan=invocs + 4)
 
 		self.tree.bind('<Double-1>', self.set_cell_value)
 
@@ -240,8 +243,7 @@ class Newtreeview():
 		xrng = np.arange(0, endpoint, resolution)
 
 		# Take calculated result and break it into one 3D array where each array one step in is all one task
-		hold = np.zeros((given.shape[0], given.shape[1] - 3, 3))
-
+		hold = np.zeros((given.shape[0], calculated.shape[0], 3))
 		for taskamt in range(given.shape[0]):
 			# for invocamt in range(given.shape[1]-3):
 			for index, x in enumerate(calculated[calculated[:, -1] == taskamt]):
@@ -258,6 +260,7 @@ class Newtreeview():
 			for x in range(2):
 				# print(item[x])
 				xticks.append(item[x])
+
 		# xticks=[round(num, 1) for num in xticks]
 		ax1.set_xticks(xticks, rotation=45)
 
@@ -278,7 +281,7 @@ class Newtreeview():
 		names = []
 		for index, x in enumerate(given):
 			names.append(str(ltn[lk[index]]))  # Replaces each label assigned number with its label
-		print(names)
+		# print(names)
 
 		# Add each task array to the plot with a unique colour
 		for index, tasklist in enumerate(hold):
@@ -293,7 +296,7 @@ class Newtreeview():
 		plt.show()
 
 	def createplot(self, freqflag):
-		# Creates the shit
+		# Acquire data currently input to fields
 		self.getvalues()
 		# print(self.treedata,freqflag)
 
@@ -310,3 +313,27 @@ class Newtreeview():
 		endpointe = ceil(calculatede[-1,-3])+1
 
 		self.makegraph(self.treedata, calculatede, resolutione, endpointe, self.labeltonumber, self.labelkeys)
+
+	def savearray(self, invocamt):
+		""" Opens a pop up where user can choose a file location to save data to and save data to it"""
+		pop=savepop(self.treedata, self.labeltonumber, self.labelkeys, invocamt)
+		pop.makewin()
+
+
+class savepop():
+	def __init__(self, treedata, labeltonumber, labelkeys, invocamt):
+		self.treedata = treedata
+		self.labeltonumber = labeltonumber
+		self.labelkeys = labelkeys
+		self.invocamt = invocamt
+
+
+	def makewin(self):
+		win = tk.Toplevel()
+		win.wm_title("Window")
+
+		l = tk.Label(win, text="Input")
+		l.grid(row=0, column=0)
+
+		b = ttk.Button(win, text="Okay", command=win.destroy)
+		b.grid(row=1, column=0)

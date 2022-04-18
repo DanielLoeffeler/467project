@@ -1,130 +1,133 @@
-import numpy as np
-import matplotlib.pyplot as plt
-import Math as EDF
-from math import ceil
-
-# [[label1, worstcom1, period1, invocations1,1, invocations1,2],
-#  [label2, worstcom2, period2, invocations2,1, invocations2,2]]
-# [[frequencies]]
-
-# [[label1, instances1]
-#  [label2, instances2]]
-# where instances:
-# [[start,stop,frequency], [start,stop,frequency], [start,stop,frequency]]
-
-"""
-make an x linspace from 0 to the end of the last task with a certain resolution
-make arrays with of the length of that x array filled with 0, then
-for the ranges where a task is (between start and stop) , fill that range with the frequency value
-"""
-
-
-
-
-
-# taskval = np.zeros(xrng.size)
+# import numpy as np
+# import matplotlib.pyplot as plt
+# import Math as EDF
+# from math import ceil
 #
-# for i, item in enumerate(task1):
-# 	taskval = change_range(taskval, item[0]/resolution, item[1]/resolution, item[2])
-# 	print(taskval)
+# # [[label1, worstcom1, period1, release1, invocations1,1, invocations1,2],
+# #  [label2, worstcom2, period2, release2, invocations2,1, invocations2,2]]
+# # [[frequencies]]
+#
+# # [[label1, instances1]
+# #  [label2, instances2]]
+# # where instances:
+# # [[start,stop,frequency], [start,stop,frequency], [start,stop,frequency]]
+#
+# """
+# make an x linspace from 0 to the end of the last task with a certain resolution
+# make arrays with of the length of that x array filled with 0, then
+# for the ranges where a task is (between start and stop) , fill that range with the frequency value
+# """
+#
+#
+#
+#
+#
+# # taskval = np.zeros(xrng.size)
+# #
+# # for i, item in enumerate(task1):
+# # 	taskval = change_range(taskval, item[0]/resolution, item[1]/resolution, item[2])
+# # 	print(taskval)
+#
+# # item = np.array([0, 2.3, 1])
+# # test = np.arange(0, 30, 1)
+# # test = change_range(test, item[0]/resolution, item[1]/resolution, 4)
+#
+#
+# # yval1 = [0, 1, 1, 0, 0, 0, 0, .5, .5, .5, .5, 0, 0, 0, 0, 0, 1, 1, 1, 1]
+# # yval2 = [0, 0, 0, .5, .5, .5, .5, 0, 0, 0, 0, 0, .25, .25, .25, .25, 0, 0, 0, 0]
+#
+#
+#
+# def dopl(given, calculated, resolution, endpoint, ltn, lk):
+#     def make_yval(ranges, res, xrange):
+#         # Takes the instance array and returns an array containing the frequency values for each unit of time
+#         # between the start and the stop
+#         taskval = np.zeros(xrange.size)
+#
+#         for i, item in enumerate(ranges):
+#             taskval[int(item[0] // res):int(item[1] // res)] = item[2]
+#             print(int(item[0] // res))
+#         return taskval
+#
+#     # Makes all the poitn on x axis for data
+#     xrng = np.arange(0, endpoint, resolution)
+#
+#     # Take calculated result and break it into one 3D array where each array one step in is all one task
+#     hold=np.zeros((given.shape[0],given.shape[1]-3,3))
+#
+#     for taskamt in range(given.shape[0]):
+#         # for invocamt in range(given.shape[1]-3):
+#         for index, x in enumerate(calculated[calculated[:, -1] == taskamt]):
+#             hold[taskamt, index]=x[0:3]
+#
+#     colourlist=['b','g','r','c','m','y','k','w']
+#     yvals=[]
+#
+#     ax1 = plt.subplot()
+#     print (calculated)
+#     # extract all the xticks from calculated array
+#     xticks=[]
+#     for item in calculated:
+#         for x in range(2):
+#             # print(item[x])
+#             xticks.append(item[x])
+#     # xticks=[round(num, 1) for num in xticks]
+#     ax1.set_xticks(xticks, rotation=45)
+#
+#     # extracts all the yticks from calculated array
+#     yticks=[]
+#     for item in calculated:
+#         yticks.append(item[2])
+#     yticks = [round(num, 2) for num in yticks]
+#     ax1.set_yticks(yticks)
+#
+#     yxpos=[]
+#     for item in calculated:
+#         yxpos.append(item[0])
+#
+#     # Add each task array to the plot with a unique colour
+#     for index, tasklist in enumerate(hold):
+#         yvals=make_yval(tasklist, resolution, xrng)
+#         plt.bar(xrng, yvals, width=resolution, align="center", color=colourlist[index])
+#
+#     for index, value in enumerate(yticks):
+#         plt.text(yxpos[index], value,str(value))
+#
+#     names=[]
+#     for index, x in enumerate(given):
+#         names.append(str(ltn[lk[index]]))  # Replaces each label assigned number with its label
+#
+#     plt.legend(names, loc='upper right')
+#     plt.xticks(rotation=90)
+#     plt.show()
+#
+# def runprog(givene, z, ltn, lk):
+#     calculatede = EDF.Run(givene,z )
+#
+#     # Remove all rows with only zeroes in them
+#     calculatede = calculatede[~np.all(calculatede == 0, axis=1)]
+#
+#     # Remove all rows where the last item is -1
+#     calculatede = calculatede[calculatede[:, -1] != -1]
+#
+#     resolutione = 0.01
+#
+#     endpointe = ceil(calculatede[-1,-3])+1
+#
+#     dopl(givene, calculatede, resolutione, endpointe, ltn, lk)
+#
+#
+# given = np.array([[0, 3, 8, 2, 2, 1],
+#                   [1, 3, 10, 0, 1, 1],
+#                   [2, 1, 14, 0, 1, 1]])
+# # givene=np.array([[0,3,8,2,1],[1,5,50,5,1],[2,2,14,2,1]])
+#
+# labeltonumber = {0: 'a', 1: 'b', 2: 'c'}
+# labelkeys = range(0, 3)
+# z=0
+# runprog(given, z, labeltonumber, labelkeys)
 
-# item = np.array([0, 2.3, 1])
-# test = np.arange(0, 30, 1)
-# test = change_range(test, item[0]/resolution, item[1]/resolution, 4)
 
-
-# yval1 = [0, 1, 1, 0, 0, 0, 0, .5, .5, .5, .5, 0, 0, 0, 0, 0, 1, 1, 1, 1]
-# yval2 = [0, 0, 0, .5, .5, .5, .5, 0, 0, 0, 0, 0, .25, .25, .25, .25, 0, 0, 0, 0]
-
-
-
-def dopl(given, calculated, resolution, endpoint, ltn, lk):
-    def make_yval(ranges, res, xrange):
-        # Takes the instance array and returns an array containing the frequency values for each unit of time
-        # between the start and the stop
-        taskval = np.zeros(xrange.size)
-
-        for i, item in enumerate(ranges):
-            taskval[int(item[0] // res):int(item[1] // res)] = item[2]
-            print(int(item[0] // res))
-        return taskval
-
-    # Makes all the poitn on x axis for data
-    xrng = np.arange(0, endpoint, resolution)
-
-    # Take calculated result and break it into one 3D array where each array one step in is all one task
-    hold=np.zeros((given.shape[0],given.shape[1]-3,3))
-
-    for taskamt in range(given.shape[0]):
-        # for invocamt in range(given.shape[1]-3):
-        for index, x in enumerate(calculated[calculated[:, -1] == taskamt]):
-            hold[taskamt, index]=x[0:3]
-
-    colourlist=['b','g','r','c','m','y','k','w']
-    yvals=[]
-
-    ax1 = plt.subplot()
-    print (calculated)
-    # extract all the xticks from calculated array
-    xticks=[]
-    for item in calculated:
-        for x in range(2):
-            # print(item[x])
-            xticks.append(item[x])
-    # xticks=[round(num, 1) for num in xticks]
-    ax1.set_xticks(xticks, rotation=45)
-
-    # extracts all the yticks from calculated array
-    yticks=[]
-    for item in calculated:
-        yticks.append(item[2])
-    yticks = [round(num, 2) for num in yticks]
-    ax1.set_yticks(yticks)
-
-    yxpos=[]
-    for item in calculated:
-        yxpos.append(item[0])
-
-    # Add each task array to the plot with a unique colour
-    for index, tasklist in enumerate(hold):
-        yvals=make_yval(tasklist, resolution, xrng)
-        plt.bar(xrng, yvals, width=resolution, align="center", color=colourlist[index])
-
-    for index, value in enumerate(yticks):
-        plt.text(yxpos[index], value,str(value))
-
-    names=[]
-    for index, x in enumerate(given):
-        names.append(str(ltn[lk[index]]))  # Replaces each label assigned number with its label
-
-    plt.legend(names, loc='upper right')
-    plt.xticks(rotation=90)
-    plt.show()
-
-def runprog(givene, ltn, lk):
-    calculatede = EDF.Run(givene)
-
-    # Remove all rows with only zeroes in them
-    calculatede = calculatede[~np.all(calculatede == 0, axis=1)]
-
-    # Remove all rows where the last item is -1
-    calculatede = calculatede[calculatede[:, -1] != -1]
-
-    resolutione = 0.1
-
-    endpointe = ceil(calculatede[-1,-3])+1
-
-    dopl(givene, calculatede, resolutione, endpointe, ltn, lk)
-
-given = np.array([[0, 3, 8, 2, 1],
-                  [1, 3, 10, 1, 1],
-                  [2, 1, 14, 1, 1]])
-# givene=np.array([[0,3,8,2,1],[1,5,50,5,1],[2,2,14,2,1]])
-
-labeltonumber = {0: 'a', 1: 'b', 2: 'c'}
-labelkeys = range(0, 3)
-
-runprog(given, labeltonumber, labelkeys)
 
 # print(hold)
 # tasks = np.array([[0, 2.3, 1, 0],
@@ -134,16 +137,16 @@ runprog(given, labeltonumber, labelkeys)
 #                   [11, 12, 1, 1],
 #                   [13, 16, 0.5, 0],
 #                   [16, 19, 0.25, 1]])
-
-
+#
+#
 # calculated = calculated[calculated[:,-1] !=-1]
-
+#
 # print(n)
 # yval1=make_yval(calculated, resolution, xrng)
 # print(yval1)
 # task1 = np.array([[0, 2.3, 1], [4.5, 6, 0.25], [13, 16, 0.5]])
 # task2 = np.array([[2.3, 4, 0.5], [7, 10, 0.75], [11, 12, 1], [16, 19, 0.25]])
-
+#
 # yval1 = make_yval(task1, resolution, xrng)
 # yval2 = make_yval(task2, resolution, xrng)
 # for t in tasks:
@@ -156,8 +159,8 @@ runprog(given, labeltonumber, labelkeys)
 # plt.bar(xrng, yval2, width=resolution, align="center", color='blue')
 #
 # plt.show()
-
-
+#
+#
 # given = np.array([[0, 3, 8, 2, 1], [1, 3, 10, 1, 1], [2, 1, 14, 1, 1]])
 # calculated = EDF.Run(given)
 #
@@ -603,6 +606,67 @@ runprog(given, labeltonumber, labelkeys)
 #     root.mainloop()
 
 
+
+# import tkinter as tk
+# from tkinter import ttk
+# from tkinter.messagebox import showinfo
+#
+# def popup_bonus():
+#     win = tk.Toplevel()
+#     win.wm_title("Window")
+#
+#     l = tk.Label(win, text="Input")
+#     l.grid(row=0, column=0)
+#
+#     b = ttk.Button(win, text="Okay", command=win.destroy)
+#     b.grid(row=1, column=0)
+#
+# def popup_showinfo():
+#     showinfo("Window", "Hello World!")
+#
+# class Application(ttk.Frame):
+#
+#     def __init__(self, master):
+#         ttk.Frame.__init__(self, master)
+#         self.pack()
+#
+#         self.button_bonus = ttk.Button(self, text="Bonuses", command=popup_bonus)
+#         self.button_bonus.pack()
+#
+#         self.button_showinfo = ttk.Button(self, text="Show Info", command=popup_showinfo)
+#         self.button_showinfo.pack()
+#
+# root = tk.Tk()
+#
+# app = Application(root)
+#
+# root.mainloop()
+
+
+# class hold():
+#     def __init__(self, list):
+#         self.info=list
+#         self.cinfo=list
+#
+#     def print(self):
+#         print(self.info, self.cinfo)
+#
+#     def change(self):
+#         self.info = ['ass']
+#
+#     def changeb(self):
+#         self.info = list(self.cinfo)
+#         self.info = ['butts']
+#
+# m=hold(['1,2,3'])
+# m.print()
+# m.change()
+# m.print()
+# m.changeb()
+# m.print()
+
+
+import matplotlib.colors as col
 
 
 

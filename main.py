@@ -25,7 +25,7 @@ root.columnconfigure(0, weight=1)
 root.rowconfigure(0, weight=1)
 
 # Table widget displaying entered task information
-columns = ['Task', 'Worst time', 'Period']
+columns = ['Task', 'Worst time', 'Period', 'Release']
 ntree = GUI.Newtreeview(mainframe, columns=columns, show="headings")
 
 ntree.tree.grid(column=0, row=0, sticky='new', columnspan=3)
@@ -44,25 +44,25 @@ Tinvoc_E = ttk.Entry(mainframe, textvariable=Tinvoc)
 Tinvoc_E.grid(column=1, row=1, sticky='ew')
 
 # Buttons
-Addinvoccol_B = tk.Button(
+Addinvoccol_B = ttk.Button(
     mainframe,
     text='Set Invocations',
     command=lambda: ntree.setinvoccol(Tinvoc.get())
 )
 
-Savedat_B = tk.Button(
+Savedat_B = ttk.Button(
     mainframe,
     text='Save Tasks',
     command=lambda: ntree.getvalues()
 )
 
-Loaddat_B = tk.Button(
+Loaddat_B = ttk.Button(
     mainframe,
     text='Load Tasks',
     command=lambda: ntree.loadfromlist()
 )
 
-Cleardat_B = tk.Button(
+Cleardat_B = ttk.Button(
     mainframe,
     text='Clear Table',
     command=lambda: ntree.cleartreeview(True)
@@ -88,10 +88,11 @@ FixFreq.grid(column=1, row=3)
 
 ntree.tree.bind('<Double-1>', ntree.set_cell_value)
 
+# Creates all the empty rows with zeroes so that users can actually edit
 filler = ['', '', '', '', '', '', '', '', '', '', '']
 fillzero = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 for i in range(min(len(filler), len(filler))):
-    ntree.tree.insert('', i, values=(filler[i], fillzero[i], fillzero[i]))
+    ntree.tree.insert('', i, values=(filler[i], fillzero[i], fillzero[i], fillzero[i]))
 
 if __name__ == '__main__':
     root.mainloop()
