@@ -9,7 +9,7 @@ Output
 """
 import numpy as np
 
-a = np.array([[0,3,8,0,3,3],[1,8,10,0,8,8],[2,1,14,100,1,1]])
+a = np.array([[0,3,8,0,2,1],[1,3,10,0,1,1],[2,1,14,0,1,1]])
 #a = np.array([[0,9,8,0,9,1]])
 z=0
 
@@ -50,7 +50,7 @@ def GetValues(a,Release,x,y):
                 # If released
                 if Release[r,3]==0:
                     Value[r,0]=a[i,1]
-                elif Release[r,3]==-1 and Release[r,1]!=-1:
+                elif Release[r,3]==-1 and Release[r,1]!=0:
                     temp=int(Release[r,1]+3)
                     Value[r,0]=a[i,temp]
 
