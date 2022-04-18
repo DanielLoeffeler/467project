@@ -9,7 +9,7 @@ Output
 """
 import numpy as np
 
-a = np.array([[0,3,8,0,2,1],[1,3,10,0,1,1],[2,1,14,0,1,1]])
+a = np.array([[0,9,8,0,9,1],[1,3,10,0,1,1],[2,1,14,0,1,1]])
 #a = np.array([[0,9,8,0,9,1]])
 z=0
 
@@ -50,9 +50,8 @@ def GetValues(a,Release,x,y):
                 # If released
                 if Release[r,3]==0:
                     Value[r,0]=a[i,1]
-                elif Release[r,3]==-1 and Release[r,1]!=0:
-                    temp=int(Release[r,1]+3)
-                    Value[r,0]=a[i,temp]
+                elif Release[r,3]==-1 and Release[r,1]==0:
+                    Value[r,0]=a[i,1]
 
                 else:
                     Value[r,0]=a[i,y+3]
@@ -242,6 +241,7 @@ def Run(a,z):
         if checkRelease(Release,x):
             # Ensure earliest deadline task is next to run.
             sortit(Release)
+            print(Release)
             # Set end time equal to start of next release
             TF=Release[0,2]
 
@@ -263,7 +263,7 @@ def Run(a,z):
         else:
             # Ensure first task is next task to run
             sortit(Release)
-
+            print(Release)
             # Find associate row of a to first row of Release
             b=findnext(a,Release,x)
 
@@ -302,7 +302,8 @@ def Run(a,z):
             if TF==temp:
                 # Increment to show that previous Invocation was run successfuly
                 Release[0,1]+=1
-
+                #remove any leftover time from previous run
+                Release[0,4]=0
                 #Set the flag to show task has run to completion
                 Release[0, 3] = -1
                 # Check if that was the last iteration to run
@@ -313,7 +314,7 @@ def Run(a,z):
                 temp=int(Release[0,1]+3)
                 Release[0,4] = a[b,c]-(output[index-1,1] - output[index-1,0])*Freq
                 ReleaseNext(a,Release,x)
-            print(Release)
+
             print(output)
     return output
 
