@@ -9,7 +9,8 @@ Output
 """
 import numpy as np
 
-a = np.array([[0,3,8,0,2,1],[1,3,10,18,1,1],[2,1,14,0,1,1]])
+a = np.array([[0,3,8,0,3,3],[1,8,10,0,8,8],[2,1,14,100,1,1]])
+#a = np.array([[0,9,8,0,9,1]])
 z=0
 
 def sortit(a):
@@ -52,6 +53,7 @@ def GetValues(a,Release,x,y):
                 elif Release[r,3]==-1 and Release[r,1]!=-1:
                     temp=int(Release[r,1]+3)
                     Value[r,0]=a[i,temp]
+
                 else:
                     Value[r,0]=a[i,y+3]
     return Value
@@ -79,9 +81,16 @@ def CheckNextRelease(Release,TF,x):
         if Release[i,3]==-1:
             if TF <= Release[i , 2]:
                 return TF
+
+
             else:
                 temp = Release[i , 2]
                 return temp
+
+        elif Release[i, 2] < TF and Release[i, 3] != -1:
+            temp = Release[i, 2]
+            return temp
+
     return TF
 
 def assignoutput(a,b,output,Freq,TF,index):
@@ -102,7 +111,7 @@ def ReleaseNext(a,Release,x):
                 t=R
         if Release[i,3]==-1:
             Release[i,3]=0
-            Release[i,2]=Release[i,2]+a[R,2]*(Release[i,1]+1)
+            Release[i,2]=Release[i,2]+a[t,2]
             return Release
 
 def checkfinished(Release,x,y):
@@ -116,6 +125,22 @@ def checkRelease(Release,x):
         if Release[i,3]!=-1:
             return 0
     return 1
+
+def errorHandle(Release,output,x,index):
+    #check if any tasks failed to run before deadline
+    for i in range(x):
+        if Release[i,2]>=output[index-1,1] and Release[i,3]!=-1:
+            #If failed to run before deadline created error message in output
+            output[index,:]=output[index-1,:]
+            output[index,2]=-1
+            output[index,3]=Release[i,0]
+            index+=1
+            #Update Release deadline of failed task
+            for R in range(x):
+                if a[R, 0] == Release[i, 0]:
+                    t = R
+            Release[i, 2] = Release[i, 2] + a[R, 2] * (Release[i, 1] + 1)
+            Release[i,1]+=1
 
 def Run(a,z):
     #Initial sorting function to sort earliest deadline first
@@ -135,14 +160,18 @@ def Run(a,z):
             # If the release is not at 0 set the deadline of the task to 0 and lower the invocation to indicate that the task should not run
             Release[i,2]=a[i,3]
             Release[i,3]=-1
+            Release[i,1]=0
         # Coordinate the tag between the release and input data
         Release[i,0]=a[i,0]
     #Sort the Release to reorder for unreleased tasks
     sortit(Release)
+
     print(a)
     print(Release)
 
     #Create the output array to be large enough to fit worst case scenario
+
+    #output = np.zeros((10, 4))
     output=np.zeros((x*x*y*2,4))
 
     #Initialise variables
@@ -152,6 +181,12 @@ def Run(a,z):
 
    #Run one iteration so that there is an output to avoid indexing error
     Freq=calculateFrequency(a,Release,x,y,z)
+
+    #check if frequency requires runnign above 100%
+    if Freq>1:
+        Freq=1
+        print('there will be an error')
+
     # Associate line of input with Release
     b = findnext(a, Release, x)
 
@@ -167,11 +202,43 @@ def Run(a,z):
     output[0,0]=0
     output[0,1]=TF
     output[0,2]=Freq
+    index+=1
+    print(output)
+
+    #check if the task ran to completion
+    if temp==TF:
+        Release[0,3]=-1
+        Release[0,1]=1
+    else:
+        temp = int(Release[0, 1] + 3)
+        Release[0, 4] = a[b, 4] - (output[index - 1, 1] - output[index - 1, 0]) * Freq
+        ReleaseNext(a, Release, x)
+
     # Sort Release to put earliest deadline first that has released
     Release = sortit(Release)
     print(Release)
     #check if we have anything to run
     while checkfinished(Release,x,y):
+        #check for errors
+        for i in range(x):
+            if Release[i, 2] <= output[index - 1, 1] and Release[i, 3] != -1:
+                # If failed to run before deadline created error message in output
+                output[index, :] = output[index - 1, :]
+                output[index, 2] = -1
+                output[index, 3] = Release[i, 0]
+                index += 1
+                # Update Release deadline of failed task
+                for R in range(x):
+                    if a[R, 0] == Release[i, 0]:
+                        t = R
+                Release[i, 2] = Release[i, 2] + a[t, 2] * (Release[i, 1] + 1)
+                Release[i, 1] += 1
+                Release[i,4]=0
+                if Release[i,1]>=y:
+                    Release[0,2]=np.max(Release)*(y+1)+1
+                    Release[i,3]=-1
+
+
         if checkRelease(Release,x):
             # Ensure earliest deadline task is next to run.
             sortit(Release)
@@ -202,6 +269,11 @@ def Run(a,z):
 
             # Calculate the Frequency based on current system state
             Freq=calculateFrequency(a,Release,x,y,z)
+
+            #Check for over frequency
+            if Freq > 1:
+                Freq = 1
+                print('there will be an error')
 
             #Prepare to run next iteration
             c= int(Release[0,1])+4
