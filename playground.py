@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+# [[label1, worstcom1, period1,Release, invocations1, invocation2, invocation3];
 # [[label1, worstcom1, period1, invocations1, invocation2, invocation3];
 #  [label2, worstcom2, period2, invocations2]]
 # [[frequencies]]

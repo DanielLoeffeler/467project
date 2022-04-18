@@ -2,6 +2,8 @@
 This code runs the math behind the system
 
 -1 = tasks not schedulable
+
+array [Label, Worst Case, Period, Release, Invocation1...]
 """
 import numpy as np
 
