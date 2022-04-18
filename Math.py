@@ -9,7 +9,7 @@ Output
 """
 import numpy as np
 
-a = np.array([[0,3,8,0,2,1],[1,3,10,1,1,1],[2,1,14,0,1,1]])
+a = np.array([[0,3,8,0,2,1],[1,3,10,0,1,1],[2,1,14,0,1,1]])
 #a = np.array([[0,9,8,0,9,1]])
 z=0
 Tend=-1
@@ -55,7 +55,8 @@ def GetValues(a,Release,x,y):
                     Value[r,0]=a[i,1]
 
                 else:
-                    Value[r,0]=a[i,y+3]
+                    temp=int(Release[r,1])
+                    Value[r,0]=a[i,temp+3]
     return Value
 
 
