@@ -3,12 +3,14 @@ This code runs the math behind the system
 
 -1 = tasks not schedulable
 
-array [Label, Worst Case, Period, Release, Invocation1...]
+Input Format = [Label, Worst Case, Period, Release, Invocation1...]
+
+Output
 """
 import numpy as np
 
-a = np.array([[0,5,8,2,1,3],[1,5,100,5,1,2],[2,2,14,2,1,1]])
-z=1
+a = np.array([[0,3,8,0,2,1],[1,3,10,18,1,1],[2,1,14,0,1,1]])
+z=0
 
 def sortit(a):
     i=0
@@ -48,16 +50,16 @@ def GetValues(a,Release,x,y):
                 if Release[r,3]==0:
                     Value[r,0]=a[i,1]
                 elif Release[r,3]==-1 and Release[r,1]!=-1:
-                    temp=int(Release[r,1]+2)
+                    temp=int(Release[r,1]+3)
                     Value[r,0]=a[i,temp]
                 else:
-                    Value[r,0]=a[i,y+2]
+                    Value[r,0]=a[i,y+3]
     return Value
 
 
 def calculateFrequency(a,Release,x,y,z):
     Values=GetValues(a,Release,x,y)
-    print(Values)
+    #print(Values)
     Freq=0
     for r in range(x):
         Freq = Freq + Values[r, 0] / Values[r, 1]
@@ -93,11 +95,14 @@ def assignoutput(a,b,output,Freq,TF,index):
         output[index,3] = -1
     return output
 
-def ReleaseNext(Release,x):
+def ReleaseNext(a,Release,x):
     for i in range(x):
+        for R in range(x):
+            if a[R,0]==Release[i,0]:
+                t=R
         if Release[i,3]==-1:
             Release[i,3]=0
-            Release[i,2]=Release[i,2]*(Release[i,1]+1)
+            Release[i,2]=Release[i,2]+a[R,2]*(Release[i,1]+1)
             return Release
 
 def checkfinished(Release,x,y):
@@ -117,44 +122,51 @@ def Run(a,z):
     a=sortit(a)
     i=0
     x = a.shape[0]
-    y = a.shape[1] - 3
+    y = a.shape[1] - 4
+
+    # Release=[Tag, iteration,Deadline, Release flag, Time remaining on previous iteration]
     Release=np.zeros((x,5))
     for i in range(x):
-        Release[i,2]=a[i,2]
+        # determining if the task is released at zero or not
+        if a[i,3]==0:
+            # If released at 0 set the task deadline to the period
+            Release[i,2]=a[i,2]
+        else:
+            # If the release is not at 0 set the deadline of the task to 0 and lower the invocation to indicate that the task should not run
+            Release[i,2]=a[i,3]
+            Release[i,3]=-1
+        # Coordinate the tag between the release and input data
         Release[i,0]=a[i,0]
+    #Sort the Release to reorder for unreleased tasks
+    sortit(Release)
     print(a)
     print(Release)
 
+    #Create the output array to be large enough to fit worst case scenario
     output=np.zeros((x*x*y*2,4))
+
+    #Initialise variables
     index=0
     R=0
-    finish=0
     Freq=0
-    """
-    for r in range(x):
-        Freq = Freq + a[r, 1] / a[r, 2]
-    """
+
+   #Run one iteration so that there is an output to avoid indexing error
     Freq=calculateFrequency(a,Release,x,y,z)
+    # Associate line of input with Release
+    b = findnext(a, Release, x)
 
-    if Freq > 1:
-        return -1
-    else:
-        output[index, 2] = Freq
+    # Determine end time of task if no interuptions
+    TF = a[b, 4] / Freq
 
-        output[index, 0] = 0
-        output[index, 1] = a[0, 3] / Freq
-        output[index, 3] = a[0, 0]
-        index += 1
-        Release[0,1]+=1
-        Release[0, 3] = -1
+    # Save the time temporarily
+    temp = TF
+    #Check if the task ran to completion
+    TF = CheckNextRelease(Release, TF, x)
 
-        if Release[0,1]>y:
-            Release[0,2]=-1
-        Release=sortit(Release)
-
-
-
-
+    output[0,3]=Release[0,0]
+    output[0,0]=0
+    output[0,1]=TF
+    output[0,2]=Freq
     # Sort Release to put earliest deadline first that has released
     Release = sortit(Release)
     print(Release)
@@ -179,7 +191,7 @@ def Run(a,z):
             index+=1
 
             # Since we have hit a release, release the next task
-            Release=ReleaseNext(Release,x)
+            Release=ReleaseNext(a,Release,x)
 
         else:
             # Ensure first task is next task to run
@@ -192,7 +204,7 @@ def Run(a,z):
             Freq=calculateFrequency(a,Release,x,y,z)
 
             #Prepare to run next iteration
-            c= int(Release[0,1])+3
+            c= int(Release[0,1])+4
 
             #Calculate the time the task will finish assuming it is running clean
             if Release[0,4]==0:
@@ -207,7 +219,7 @@ def Run(a,z):
 
             #Check if the task will finish before the next task releases
             TF=CheckNextRelease(Release,TF,x)
-            TF
+
             #update output regardless of task finishing successfully or not
             output = assignoutput(a, b, output, Freq, TF, index)
 
@@ -228,7 +240,7 @@ def Run(a,z):
             else:
                 temp=int(Release[0,1]+3)
                 Release[0,4] = a[b,c]-(output[index-1,1] - output[index-1,0])*Freq
-                ReleaseNext(Release,x)
+                ReleaseNext(a,Release,x)
             print(Release)
             print(output)
     return output
