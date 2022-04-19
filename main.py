@@ -43,6 +43,19 @@ Tinvoc = tk.IntVar()
 Tinvoc_E = ttk.Entry(mainframe, textvariable=Tinvoc)
 Tinvoc_E.grid(column=1, row=1, sticky='ew')
 
+# Max time subframe
+maxframe = ttk.Frame(mainframe)
+maxframe.grid(column=1, row=3, sticky='ew')
+
+# Max time entry field label
+Maxtime_L = tk.Label(maxframe, text='max operating time (0 is no limit):')
+Maxtime_L.grid(column=0, row=0, columnspan=2)
+
+# Max time entry field
+Maxtime = tk.IntVar()
+Maxtime_E = ttk.Entry(maxframe, textvariable=Maxtime)
+Maxtime_E.grid(column=2, row=0, sticky='w')
+
 # Buttons
 Addinvoccol_B = ttk.Button(
     mainframe,
@@ -53,13 +66,13 @@ Addinvoccol_B = ttk.Button(
 Savedat_B = ttk.Button(
     mainframe,
     text='Save Tasks',
-    command=lambda: ntree.getvalues()
+    command=lambda: ntree.savearray(Tinvoc.get(), Maxtime.get())
 )
 
 Loaddat_B = ttk.Button(
     mainframe,
     text='Load Tasks',
-    command=lambda: ntree.loadfromlist()
+    command=lambda: ntree.loadarray()
 )
 
 Cleardat_B = ttk.Button(
@@ -83,8 +96,8 @@ Run_B.grid(column=0, row=3, sticky='ew')
 
 # Frequency Checkbox
 freqvar = tk.IntVar()
-FixFreq = tk.Checkbutton(mainframe, text='Fix Frequencies to 1Fmax, .75Fmax, and .5Fmax', variable=freqvar)
-FixFreq.grid(column=1, row=3)
+FixFreq = tk.Checkbutton(mainframe, text='Fixed Frequencies', variable=freqvar)
+FixFreq.grid(column=2, row=3)
 
 ntree.tree.bind('<Double-1>', ntree.set_cell_value)
 

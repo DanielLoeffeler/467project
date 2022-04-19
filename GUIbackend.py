@@ -2,6 +2,7 @@
 The backend functionality of the GUI
 """
 import tkinter as tk
+import tkinter.filedialog as tfd
 from tkinter import ttk
 import numpy as np
 import Math as EDF
@@ -18,7 +19,7 @@ class Newtreeview():
 		self.show = show
 		self.treedata = []
 		self.labeltonumber = {}
-		self.labelkeys = ''
+		self.labelkeys = []
 		self.tree = ttk.Treeview(frame, columns=columns, show=show)
 		self.vcmd = (self.frame.register(self.onValidate),
 		        '%d', '%i', '%P', '%s', '%S', '%v', '%V', '%W')
@@ -235,8 +236,11 @@ class Newtreeview():
 			taskval = np.zeros(xrange.size)
 
 			for i, item in enumerate(ranges):
-				taskval[int(item[0] // res):int(item[1] // res)] = item[2]
-				print(int(item[0] // res))
+				if item[2] == -1:
+					taskval[int(item[1] // res)-10:int(item[1] // res)] = 1.25
+				else:
+					taskval[int(item[0] // res):int(item[1] // res)] = item[2]
+
 			return taskval
 
 		# Makes all the poitn on x axis for data
@@ -245,20 +249,19 @@ class Newtreeview():
 		# Take calculated result and break it into one 3D array where each array one step in is all one task
 		hold = np.zeros((given.shape[0], calculated.shape[0], 3))
 		for taskamt in range(given.shape[0]):
-			# for invocamt in range(given.shape[1]-3):
 			for index, x in enumerate(calculated[calculated[:, -1] == taskamt]):
 				hold[taskamt, index] = x[0:3]
 
+		# TODO: add more colours
 		colourlist = ['b', 'g', 'r', 'c', 'm', 'y', 'k', 'w']
 		yvals = []
 
 		ax1 = plt.subplot()
-		#print(calculated)
+
 		# extract all the xticks from calculated array
 		xticks = []
 		for item in calculated:
 			for x in range(2):
-				# print(item[x])
 				xticks.append(item[x])
 
 		# xticks=[round(num, 1) for num in xticks]
@@ -271,25 +274,27 @@ class Newtreeview():
 		yticks = [round(num, 2) for num in yticks]
 		ax1.set_yticks(yticks)
 
-		yxpos = []
-		for item in calculated:
-			yxpos.append(item[0])
-
-		# for index, x in enumerate(given):
-		#     x[0] = self.labeltonumber[self.labelkeys[index]] # Replaces each label assigned number with its label
-
 		names = []
 		for index, x in enumerate(given):
 			names.append(str(ltn[lk[index]]))  # Replaces each label assigned number with its label
-		# print(names)
 
 		# Add each task array to the plot with a unique colour
 		for index, tasklist in enumerate(hold):
 			yvals = make_yval(tasklist, resolution, xrng)
 			plt.bar(xrng, yvals, width=resolution, align="center", color=colourlist[index])
 
-		for index, value in enumerate(yticks):
-			plt.text(yxpos[index], value, str(value))
+		# plot the label text above the center of the invocation with the str being the freq value or "over" if overrun
+		print(calculated)
+		for index, item in enumerate(calculated):
+			if item[0] == item[1]:
+				xpos = -10
+			else:
+				xpos = (int(item[0]) + int(item[1])) / 2
+
+			if item[2] == -1:
+				plt.text(item[1], 1.25, 'overrun', ha='center')
+			else:
+				plt.text(xpos, item[2], str(round(item[2], 2)), ha='center')
 
 		plt.legend(names, loc='upper right')
 		plt.xticks(rotation=90)
@@ -314,26 +319,46 @@ class Newtreeview():
 
 		self.makegraph(self.treedata, calculatede, resolutione, endpointe, self.labeltonumber, self.labelkeys)
 
-	def savearray(self, invocamt):
-		""" Opens a pop up where user can choose a file location to save data to and save data to it"""
-		pop=savepop(self.treedata, self.labeltonumber, self.labelkeys, invocamt)
-		pop.makewin()
+	def savearray(self, invocamt, maxtime):
+		""" Opens a pop up where user can choose a file location to save data to and save data to it """
+		filedir = tfd.asksaveasfilename(
+			title="save file",
+			initialdir='/',
+			defaultextension='.npz',
+			filetypes=[("numpy file","*.npz")])
+		if filedir:
+			self.getvalues()
+			np.savez(
+				filedir,
+				treedata=self.treedata,
+				ltr=np.array(list(self.labeltonumber.items())),
+				lk=np.array(self.labelkeys),
+				invoc=np.array([invocamt]),
+				maxtime=np.array([maxtime])
+			)
 
+	def loadarray(self):
+		""" Open a filedialog that allows user to select npz files to load """
+		filedir = tfd.askopenfilename(
+			title="load file",
+			initialdir='/',
+			filetype=[('numpy file',  '*.npz')]
+		)
+		if filedir:
+			print(filedir)
+			data = np.load(filedir)
+			print(data['treedata'])
+			print(data['ltr'])
+			print(data['lk'])
+			print(data['invoc'][0])
+			self.setinvoccol(data['invoc'][0])
 
-class savepop():
-	def __init__(self, treedata, labeltonumber, labelkeys, invocamt):
-		self.treedata = treedata
-		self.labeltonumber = labeltonumber
-		self.labelkeys = labelkeys
-		self.invocamt = invocamt
+			self.labeltonumber={}
+			self.labelkeys = data['lk'].tolist()
+			for i in self.labelkeys:
+				self.labeltonumber[i] = data['ltr'][i][1]
 
+			self.treedata = data['treedata']
+			self.loadfromlist()
 
-	def makewin(self):
-		win = tk.Toplevel()
-		win.wm_title("Window")
-
-		l = tk.Label(win, text="Input")
-		l.grid(row=0, column=0)
-
-		b = ttk.Button(win, text="Okay", command=win.destroy)
-		b.grid(row=1, column=0)
+# TODO: make save and load work
