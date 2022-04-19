@@ -7,7 +7,7 @@ from tkinter import ttk
 from ttkthemes import ThemedTk
 import GUIbackend as GUI
 import numpy as np
-
+# TODO: make tabs for matplot in tk frame
 # Create the tkinter window object called root
 root = ThemedTk(theme='breeze')
 
@@ -85,7 +85,7 @@ Run_B = tk.Button(
     mainframe,
     text='Run simulation',
     bg='forest green',
-    command=lambda: ntree. createplot(freqvar.get())
+    command=lambda: ntree. createplot(freqvar.get(), Maxtime.get())
 )
 
 Addinvoccol_B.grid(column=2, row=1, sticky='ew')
@@ -106,6 +106,7 @@ filler = ['', '', '', '', '', '', '', '', '', '', '']
 fillzero = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 for i in range(min(len(filler), len(filler))):
     ntree.tree.insert('', i, values=(filler[i], fillzero[i], fillzero[i], fillzero[i]))
+# TODO: put loaded values of entry forms into entries
 
 if __name__ == '__main__':
     root.mainloop()

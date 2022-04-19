@@ -300,12 +300,16 @@ class Newtreeview():
 		plt.xticks(rotation=90)
 		plt.show()
 
-	def createplot(self, freqflag):
+	def createplot(self, freqflag, maxtime):
 		# Acquire data currently input to fields
 		self.getvalues()
 		# print(self.treedata,freqflag)
+		if maxtime == 0:
+			maxtime = -1
+		elif maxtime < 0:
+			maxtime = -1
 
-		calculatede = EDF.Run(self.treedata, freqflag)
+		calculatede = EDF.Run(self.treedata, freqflag, maxtime)
 
 		# Remove all rows with only zeroes in them
 		calculatede = calculatede[~np.all(calculatede == 0, axis=1)]
@@ -345,20 +349,14 @@ class Newtreeview():
 			filetype=[('numpy file',  '*.npz')]
 		)
 		if filedir:
-			print(filedir)
 			data = np.load(filedir)
-			print(data['treedata'])
-			print(data['ltr'])
-			print(data['lk'])
-			print(data['invoc'][0])
 			self.setinvoccol(data['invoc'][0])
-
 			self.labeltonumber={}
 			self.labelkeys = data['lk'].tolist()
 			for i in self.labelkeys:
 				self.labeltonumber[i] = data['ltr'][i][1]
 
 			self.treedata = data['treedata']
+
 			self.loadfromlist()
 
-# TODO: make save and load work

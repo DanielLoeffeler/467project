@@ -176,8 +176,8 @@ def Run(a,z,Tend):
 
     sortit(Release)
 
-    print(a)
-    print(Release)
+    #print(a)
+    #print(Release)
 
     #Create the output array to be large enough to fit worst case scenario
 
@@ -195,7 +195,7 @@ def Run(a,z,Tend):
     #check if frequency requires runnign above 100%
     if Freq>1:
         Freq=1
-        print('there will be an error')
+        #print('there will be an error')
 
     # Associate line of input with Release
     b = findnext(a, Release, x)
@@ -213,7 +213,7 @@ def Run(a,z,Tend):
     output[0,1]=TF
     output[0,2]=Freq
     index+=1
-    print(output)
+    #print(output)
 
     #check if the task ran to completion
     if temp==TF:
@@ -226,7 +226,7 @@ def Run(a,z,Tend):
 
     # Sort Release to put earliest deadline first that has released
     Release = sortit(Release)
-    print(Release)
+    #print(Release)
     #check if we have anything to run
     while checkfinished(Release,x,y):
         #check for errors
@@ -253,7 +253,7 @@ def Run(a,z,Tend):
         if checkRelease(Release,x):
             # Ensure earliest deadline task is next to run.
             sortit(Release)
-            print(Release)
+            #print(Release)
             # Set end time equal to start of next release
             TF=Release[0,2]
 
@@ -275,7 +275,7 @@ def Run(a,z,Tend):
         else:
             # Ensure first task is next task to run
             sortit(Release)
-            print(Release)
+            #print(Release)
             # Find associate row of a to first row of Release
             b=findnext(a,Release,x)
 
@@ -285,7 +285,7 @@ def Run(a,z,Tend):
             #Check for over frequency
             if Freq > 1:
                 Freq = 1
-                print('there will be an error')
+                #print('there will be an error')
 
             #Prepare to run next iteration
             c= int(Release[0,1])+4
@@ -328,7 +328,7 @@ def Run(a,z,Tend):
                 Release[0,4] = a[b,c]-(output[index-1,1] - output[index-1,0])*Freq
                 ReleaseNext(a,Release,x)
 
-            print(output)
+            #print(output)
     return output
 
 """
@@ -395,4 +395,4 @@ elif index < x:
 
 
 
-print(Run(a,z,Tend))
+#print(Run(a,z,Tend))
