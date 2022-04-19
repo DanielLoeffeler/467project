@@ -24,9 +24,6 @@ class Newtreeview():
 		self.vcmd = (self.frame.register(self.onValidate),
 		        '%d', '%i', '%P', '%s', '%S', '%v', '%V', '%W')
 
-	def printcolumns(self):
-		print(self.columns)
-
 	def cleartreeview(self,fill=False):
 		"""Clears all values from tree view and restores it to zeros"""
 		for line in self.tree.get_children():
@@ -94,7 +91,7 @@ class Newtreeview():
 
 	def getvalues(self):
 		"""Creates a numpy array storing all of the information in the tree"""
-		# # [[label1, worstcom1, period1, ,releasetime1 , invocations11, invocations12],
+		# # [[label1, worstcom1, period1, ,releasetime1 ,invocations11, invocations12],
 		# #  [label2, worstcom2, period2, ,releasetime1 ,invocations21, invocations22]]
 		self.treedata = []
 		for index, line in enumerate(self.tree.get_children()):
@@ -120,9 +117,8 @@ class Newtreeview():
 		# Transfer the data list into the numpy array standard for run time
 		# # [[label1, worstcom1, period1, release1, invocations1],
 		# #  [label2, worstcom2, period2, release2, invocations2]]
-		#print(len(data),len(self.treedata[0]))
+
 		ndat = np.zeros((len(data), len(self.treedata[0])))
-		#print(ndat.shape)
 		try:
 			for index1, x in enumerate(ndat):
 				for index2, y in enumerate(data[index1]):
@@ -222,7 +218,9 @@ class Newtreeview():
 		# self.text.insert("end", "v='%s'\n" % v)
 		# self.text.insert("end", "V='%s'\n" % V)
 		# self.text.insert("end", "W='%s'\n" % W)
-
+		# add more colors
+		# do tabs and plot in window
+		# make it so loading changes the forms
 		if (S.isdigit()):
 			return True
 		else:
@@ -252,7 +250,7 @@ class Newtreeview():
 			for index, x in enumerate(calculated[calculated[:, -1] == taskamt]):
 				hold[taskamt, index] = x[0:3]
 
-		# TODO: add more colours
+
 		colourlist = ['b', 'g', 'r', 'c', 'm', 'y', 'k', 'w']
 		yvals = []
 
