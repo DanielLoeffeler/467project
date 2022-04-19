@@ -292,7 +292,8 @@ class Newtreeview():
 				xpos = (int(item[0]) + int(item[1])) / 2
 
 			if item[2] == -1:
-				plt.text(item[1], 1.25, 'overrun', ha='center')
+				plt.text(item[1], 1.3, 'missed deadline:', ha='center')
+				plt.text(item[1], 1.25, str(ltn[item[-1]]), ha='center')
 			else:
 				plt.text(xpos, item[2], str(round(item[2], 2)), ha='center')
 

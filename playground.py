@@ -19,9 +19,6 @@ for the ranges where a task is (between start and stop) , fill that range with t
 """
 
 
-
-
-
 # taskval = np.zeros(xrng.size)
 #
 # for i, item in enumerate(task1):
